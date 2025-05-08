@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -17,6 +18,15 @@ declare global {
             language_code?: string;
           };
         };
+        ready: () => void;
+        expand: () => void;
+        close: () => void;
+        MainButton: {
+          show: () => void;
+          hide: () => void;
+          setText: (text: string) => void;
+          onClick: (callback: () => void) => void;
+        };
       };
     };
   }
@@ -24,26 +34,55 @@ declare global {
 
 const TelegramWebAppButton = () => {
   const { loginWithTelegram } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const webApp = window.Telegram?.WebApp;
-    if (webApp && webApp.initDataUnsafe.user) {
-      const user = {
-        id: webApp.initDataUnsafe.user.id,
-        first_name: webApp.initDataUnsafe.user.first_name,
-        last_name: webApp.initDataUnsafe.user.last_name,
-        username: webApp.initDataUnsafe.user.username,
-        auth_date: Math.floor(Date.now() / 1000),
-        hash: webApp.initData,
-      };
+    if (webApp) {
+      // Initialiser la Web App
+      webApp.ready();
+      webApp.expand();
 
-      console.log('Telegram Web App user:', user);
-      loginWithTelegram(user).catch(error => {
-        console.error('Error during Telegram login:', error);
+      // Configurer le bouton principal
+      webApp.MainButton.setText('Se connecter');
+      webApp.MainButton.show();
+
+      // Gérer le clic sur le bouton principal
+      webApp.MainButton.onClick(async () => {
+        if (webApp.initDataUnsafe.user) {
+          const user = {
+            id: webApp.initDataUnsafe.user.id,
+            first_name: webApp.initDataUnsafe.user.first_name,
+            last_name: webApp.initDataUnsafe.user.last_name,
+            username: webApp.initDataUnsafe.user.username,
+            auth_date: Math.floor(Date.now() / 1000),
+            hash: webApp.initData,
+          };
+
+          try {
+            await loginWithTelegram(user);
+            // Rediriger vers la page de profil
+            router.push('/profile');
+          } catch (error) {
+            console.error('Error during Telegram login:', error);
+          }
+        }
       });
     }
-  }, [loginWithTelegram]);
 
+    return () => {
+      if (webApp) {
+        webApp.MainButton.hide();
+      }
+    };
+  }, [loginWithTelegram, router]);
+
+  // Si nous sommes dans Telegram Web App, ne pas afficher le bouton
+  if (window.Telegram?.WebApp) {
+    return null;
+  }
+
+  // Sinon, afficher le bouton normal
   return (
     <button
       className="bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-2 px-4 rounded"
