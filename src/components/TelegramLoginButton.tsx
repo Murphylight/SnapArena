@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -28,12 +28,14 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 }) => {
   const { loginWithTelegram, loading } = useAuth();
   const router = useRouter();
+  const [isInTelegram, setIsInTelegram] = useState(false);
 
   useEffect(() => {
     const checkTelegramAuth = async () => {
       try {
         // Vérifier si nous sommes dans Telegram
         if (window.Telegram?.WebApp) {
+          setIsInTelegram(true);
           const webApp = window.Telegram.WebApp;
           const user = webApp.initDataUnsafe.user;
           
@@ -65,7 +67,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   }, [loginWithTelegram, onAuth, router]);
 
   // Si nous sommes dans Telegram, ne pas afficher le bouton
-  if (window.Telegram?.WebApp) {
+  if (isInTelegram) {
     return null;
   }
 
