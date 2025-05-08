@@ -15,6 +15,31 @@ export interface TelegramUser {
   hash: string;
 }
 
+// Interface pour Telegram WebApp
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        ready: () => void;
+        expand: () => void;
+        initData: string;
+        initDataUnsafe: {
+          user?: {
+            id: number;
+            first_name: string;
+            last_name?: string;
+            username?: string;
+            language_code?: string;
+          };
+          query_id?: string;
+          auth_date?: number;
+          hash?: string;
+        };
+      };
+    };
+  }
+}
+
 interface TelegramLoginButtonProps {
   botName: string;
   onAuth?: (user: TelegramUser) => void;
@@ -70,8 +95,6 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           webApp.ready();
           webApp.expand();
           
-          addLog(`WebApp version: ${webApp.version}`);
-          addLog(`WebApp platform: ${webApp.platform}`);
           addLog(`WebApp initData: ${webApp.initData}`);
           addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
           
