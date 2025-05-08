@@ -45,6 +45,7 @@ const TelegramWebAppButton = () => {
   const { loginWithTelegram } = useAuth();
   const router = useRouter();
   const [logs, setLogs] = useState<string[]>([]);
+  const [isInTelegram, setIsInTelegram] = useState(false);
 
   const addLog = (message: string) => {
     setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -52,10 +53,11 @@ const TelegramWebAppButton = () => {
 
   useEffect(() => {
     addLog('TelegramWebAppButton mounted');
-    const webApp = window.Telegram?.WebApp;
-    addLog(`WebApp available: ${!!webApp}`);
+    const isTelegramWebApp = typeof window !== 'undefined' && window.Telegram?.WebApp;
+    setIsInTelegram(!!isTelegramWebApp);
     
-    if (webApp) {
+    if (isTelegramWebApp) {
+      const webApp = window.Telegram.WebApp;
       addLog('Initializing WebApp');
       webApp.ready();
       webApp.expand();
@@ -89,18 +91,16 @@ const TelegramWebAppButton = () => {
           addLog('No user data available in initDataUnsafe');
         }
       });
-    }
 
-    return () => {
-      if (webApp) {
+      return () => {
         addLog('Cleaning up WebApp');
         webApp.MainButton.hide();
-      }
-    };
+      };
+    }
   }, [loginWithTelegram, router]);
 
   // Si nous sommes dans Telegram Web App, ne pas afficher le bouton
-  if (window.Telegram?.WebApp) {
+  if (isInTelegram) {
     console.log('Running inside Telegram WebApp, not showing button');
     return null;
   }
@@ -115,7 +115,7 @@ const TelegramWebAppButton = () => {
         onError={(e) => addLog(`Error loading Telegram script: ${e}`)}
       />
       
-      {!window.Telegram?.WebApp && (
+      {!isInTelegram && (
         <button
           className="bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-2 px-4 rounded"
           onClick={() => {
