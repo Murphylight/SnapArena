@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -28,13 +28,16 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 }) => {
   const { loginWithTelegram, loading } = useAuth();
   const router = useRouter();
+  const [isInTelegram, setIsInTelegram] = useState(false);
 
   useEffect(() => {
-    const handleTelegramAuth = async () => {
-      try {
-        // Vérifier si nous sommes dans Telegram
-        if (window.Telegram?.WebApp) {
-          console.log('Telegram WebApp detected');
+    // Vérifier si nous sommes dans Telegram uniquement côté client
+    const isTelegramWebApp = typeof window !== 'undefined' && window.Telegram?.WebApp;
+    setIsInTelegram(!!isTelegramWebApp);
+
+    if (isTelegramWebApp) {
+      const handleTelegramAuth = async () => {
+        try {
           const webApp = window.Telegram.WebApp;
           const user = webApp.initDataUnsafe.user;
           
@@ -62,21 +65,17 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           } else {
             console.log('No user data available in WebApp');
           }
-        } else {
-          console.log('Not running in Telegram WebApp');
+        } catch (error) {
+          console.error('Error in handleTelegramAuth:', error);
         }
-      } catch (error) {
-        console.error('Error in handleTelegramAuth:', error);
-      }
-    };
+      };
 
-    // Exécuter l'authentification automatique au chargement
-    handleTelegramAuth();
+      handleTelegramAuth();
+    }
   }, [loginWithTelegram, onAuth, router]);
 
   const handleLogin = async () => {
     try {
-      // Si nous ne sommes pas dans Telegram, ouvrir le bot
       window.open(`https://t.me/${botName}?start=login`, '_blank');
     } catch (error) {
       console.error('Error during Telegram login:', error);
@@ -84,7 +83,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   };
 
   // Si nous sommes dans Telegram WebApp, ne pas afficher le bouton
-  if (window.Telegram?.WebApp) {
+  if (isInTelegram) {
     return null;
   }
 
