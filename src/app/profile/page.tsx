@@ -108,7 +108,7 @@ export default function ProfilePage() {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              Historique des matchs
+              Historique de matchs
             </h2>
           </div>
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
