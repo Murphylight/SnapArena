@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import crypto from 'crypto';
+import { TelegramUser } from '@/components/TelegramLoginButton';
 
 // Initialiser Firebase Admin
 if (!getApps().length) {
@@ -15,11 +16,11 @@ if (!getApps().length) {
 }
 
 // Fonction pour vérifier la signature Telegram
-function verifyTelegramAuth(authData: any): boolean {
+function verifyTelegramAuth(authData: TelegramUser & { hash: string }): boolean {
   const { hash, ...userData } = authData;
   const dataCheckString = Object.keys(userData)
     .sort()
-    .map(k => `${k}=${userData[k]}`)
+    .map(k => `${k}=${userData[k as keyof typeof userData]}`)
     .join('\n');
   
   const secretKey = crypto.createHash('sha256')
