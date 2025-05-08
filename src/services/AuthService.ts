@@ -45,7 +45,9 @@ class AuthService {
   // Vérifier l'authentification Telegram
   async validateTelegramLogin(telegramUser: TelegramUser): Promise<string> {
     try {
-      // Envoyer les données à notre API pour validation et obtention d'un token Firebase
+      console.log('Validating Telegram login with:', telegramUser);
+      console.log('API URL:', TELEGRAM_AUTH_API);
+      
       const response = await fetch(`${TELEGRAM_AUTH_API}/auth/telegram`, {
         method: 'POST',
         headers: {
@@ -56,10 +58,12 @@ class AuthService {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Telegram validation failed:', errorData);
         throw new Error(errorData.message || 'Telegram authentication failed');
       }
 
       const data = await response.json();
+      console.log('Telegram validation successful:', data);
       return data.customToken;
     } catch (error) {
       console.error('Error validating Telegram login:', error);

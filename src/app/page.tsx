@@ -69,15 +69,26 @@ export default function Home() {
               {t('home.slogan')}
             </p>
             <div className="mt-10 space-y-6">
-              {!profile ? (
-                <div className="flex flex-col items-center">
+              {!profile && (
+                <div className="mt-8">
                   <TelegramLoginButton
-                    botName="SnapArenaBot"
+                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
                     buttonSize="large"
                     cornerRadius={8}
                     requestAccess={true}
+                    onAuth={(user) => {
+                      console.log('Telegram auth successful:', user);
+                    }}
                   />
                 </div>
+              )}
+              {!profile ? (
+                <Link 
+                  href="/games" 
+                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
+                >
+                  {t('home.exploreGames')}
+                </Link>
               ) : (
                 <Link 
                   href="/games" 
@@ -246,15 +257,26 @@ export default function Home() {
               {t('home.joinToday')}
             </p>
             <div className="mt-8">
-              {!profile ? (
-                <div className="flex flex-col items-center">
+              {!profile && (
+                <div className="mt-8">
                   <TelegramLoginButton
-                    botName="SnapArenaBot"
+                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
                     buttonSize="large"
                     cornerRadius={8}
                     requestAccess={true}
+                    onAuth={(user) => {
+                      console.log('Telegram auth successful:', user);
+                    }}
                   />
                 </div>
+              )}
+              {!profile ? (
+                <Link 
+                  href="/games" 
+                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-amber-600 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
+                >
+                  {t('home.startPlaying')}
+                </Link>
               ) : (
                 <Link 
                   href="/games" 

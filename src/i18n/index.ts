@@ -34,6 +34,15 @@ export const countryCurrencies: Record<CountryCode, Currency> = {
   // Ajouter d'autres pays selon les besoins
 };
 
+export const countryNames: Record<CountryCode, string> = {
+  US: 'United States',
+  GB: 'United Kingdom',
+  FR: 'France',
+  SN: 'Senegal',
+  NG: 'Nigeria',
+  // Ajoutez d'autres pays selon vos besoins
+};
+
 // Initialiser i18next
 i18next
   .use(initReactI18next)
