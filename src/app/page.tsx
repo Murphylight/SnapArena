@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -37,6 +37,15 @@ const staggerContainer = {
 export default function Home() {
   const { t } = useTranslation();
   const { profile, user } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // ou un loader si vous préférez
+  }
 
   return (
     <div className="min-h-screen">
