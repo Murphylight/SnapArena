@@ -30,7 +30,7 @@ declare global {
 }
 
 interface TelegramLoginButtonProps {
-  botName: string; // Le nom d'utilisateur du bot sans '@'
+  botName: string;
   onAuth?: (user: TelegramUser) => void;
   buttonSize?: 'large' | 'medium' | 'small';
   cornerRadius?: number;
@@ -50,12 +50,11 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Nettoyer le conteneur
-    if (containerRef.current) {
-      containerRef.current.innerHTML = '';
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      currentContainer.innerHTML = '';
     }
     
-    // Injecter le script de Telegram
     const script = document.createElement('script');
     script.src = 'https://telegram.org/js/telegram-widget.js?22';
     script.setAttribute('data-telegram-login', botName);
@@ -66,27 +65,21 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
     script.setAttribute('data-onauth', 'onTelegramAuth');
     script.async = true;
 
-    // Déclarer la fonction de callback globale
     window.onTelegramAuth = (user: TelegramUser) => {
-      // Utiliser le service d'authentification
       loginWithTelegram(user).catch(error => {
         console.error('Error during Telegram login:', error);
       });
       
-      // Appeler le callback personnalisé si fourni
       if (onAuth) {
         onAuth(user);
       }
     };
 
-    // Ajouter le script au DOM
-    const currentContainer = containerRef.current;
     if (currentContainer) {
       currentContainer.appendChild(script);
     }
 
     return () => {
-      // Nettoyage
       if (currentContainer) {
         const scriptElement = currentContainer.querySelector('script');
         if (scriptElement) {

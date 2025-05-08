@@ -45,9 +45,9 @@ export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   // Charger les préférences sauvegardées au démarrage
   useEffect(() => {
-    const savedCountry = localStorage.getItem('country');
+    const savedCountry = localStorage.getItem('userCountry');
     if (savedCountry) {
-      setCountry(savedCountry);
+      setCountry(savedCountry as CountryCode);
     }
   }, [setCountry]);
 
