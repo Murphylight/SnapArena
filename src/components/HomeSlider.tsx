@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Image from 'next/image';
 
 const HomeSlider: React.FC = () => {
   const { t } = useTranslation();
@@ -79,11 +80,13 @@ const HomeSlider: React.FC = () => {
               transition={{ duration: 0.5 }}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="relative aspect-w-16 aspect-h-9">
-                <img 
-                  src={item.image} 
-                  alt={item.title}
-                  className="w-full object-cover"
+              <div className="relative h-64 w-full">
+                <Image
+                  src={item.image}
+                  alt={t(item.title)}
+                  fill
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               <div className="p-6">

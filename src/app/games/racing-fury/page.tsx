@@ -140,13 +140,14 @@ export default function RacingFuryGame() {
 
   // Effet pour initialiser le jeu WebGL
   useEffect(() => {
-    if (gameState.status === 'playing' && gameContainerRef.current) {
+    const currentContainer = gameContainerRef.current;
+    if (currentContainer) {
       // Ici, vous intégrez le jeu WebGL Unity
       // Dans une implémentation réelle, vous pourriez charger le jeu Unity
       // comme dans l'exemple ci-dessous:
       /*
       const unityInstance = UnityLoader.instantiate(
-        gameContainerRef.current,
+        currentContainer,
         "/unity/racing-fury/Build/racing-fury.json",
         { onProgress: (progress) => console.log(progress) }
       );
@@ -154,9 +155,9 @@ export default function RacingFuryGame() {
 
       // Pour la démo, nous utilisons une animation simple
       const canvas = document.createElement('canvas');
-      canvas.width = gameContainerRef.current.clientWidth;
-      canvas.height = gameContainerRef.current.clientHeight;
-      gameContainerRef.current.appendChild(canvas);
+      canvas.width = currentContainer.clientWidth;
+      canvas.height = currentContainer.clientHeight;
+      currentContainer.appendChild(canvas);
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
@@ -198,14 +199,14 @@ export default function RacingFuryGame() {
         
         animate();
       }
-
-      return () => {
-        // Nettoyage si nécessaire
-        if (gameContainerRef.current) {
-          gameContainerRef.current.innerHTML = '';
-        }
-      };
     }
+
+    return () => {
+      if (currentContainer) {
+        // Nettoyage si nécessaire
+        currentContainer.innerHTML = '';
+      }
+    };
   }, [gameState.status, gameState.players]);
 
   return (

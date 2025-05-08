@@ -47,7 +47,6 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   requestAccess = true,
   className = '',
 }) => {
-  const { t } = useTranslation();
   const { loginWithTelegram, loading } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -82,14 +81,17 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
     };
 
     // Ajouter le script au DOM
-    containerRef.current?.appendChild(script);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      currentContainer.appendChild(script);
+    }
 
     return () => {
       // Nettoyage
-      if (containerRef.current) {
-        const scriptElement = containerRef.current.querySelector('script');
+      if (currentContainer) {
+        const scriptElement = currentContainer.querySelector('script');
         if (scriptElement) {
-          containerRef.current.removeChild(scriptElement);
+          currentContainer.removeChild(scriptElement);
         }
       }
       delete window.onTelegramAuth;
