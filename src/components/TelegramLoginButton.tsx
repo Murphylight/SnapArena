@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 // Déclaration d'interface pour l'utilisateur Telegram
 export interface TelegramUser {
@@ -26,37 +27,66 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   className = '',
 }) => {
   const { loginWithTelegram, loading } = useAuth();
-  
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleTelegramAuth = async () => {
+      try {
+        // Vérifier si nous sommes dans Telegram
+        if (window.Telegram?.WebApp) {
+          console.log('Telegram WebApp detected');
+          const webApp = window.Telegram.WebApp;
+          const user = webApp.initDataUnsafe.user;
+          
+          if (user) {
+            console.log('User data available:', user);
+            const telegramUser: TelegramUser = {
+              id: user.id,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              username: user.username,
+              auth_date: Math.floor(Date.now() / 1000),
+              hash: webApp.initData,
+            };
+            
+            try {
+              await loginWithTelegram(telegramUser);
+              console.log('Login successful');
+              if (onAuth) {
+                onAuth(telegramUser);
+              }
+              router.push('/profile');
+            } catch (error) {
+              console.error('Error during Telegram login:', error);
+            }
+          } else {
+            console.log('No user data available in WebApp');
+          }
+        } else {
+          console.log('Not running in Telegram WebApp');
+        }
+      } catch (error) {
+        console.error('Error in handleTelegramAuth:', error);
+      }
+    };
+
+    // Exécuter l'authentification automatique au chargement
+    handleTelegramAuth();
+  }, [loginWithTelegram, onAuth, router]);
+
   const handleLogin = async () => {
     try {
-      // Vérifier si nous sommes dans Telegram
-      if (window.Telegram?.WebApp) {
-        const webApp = window.Telegram.WebApp;
-        const user = webApp.initDataUnsafe.user;
-        
-        if (user) {
-          const telegramUser: TelegramUser = {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            username: user.username,
-            auth_date: Math.floor(Date.now() / 1000),
-            hash: webApp.initData,
-          };
-          
-          await loginWithTelegram(telegramUser);
-          if (onAuth) {
-            onAuth(telegramUser);
-          }
-        }
-      } else {
-        // Si nous ne sommes pas dans Telegram, ouvrir le bot
-        window.open(`https://t.me/${botName}?start=login`, '_blank');
-      }
+      // Si nous ne sommes pas dans Telegram, ouvrir le bot
+      window.open(`https://t.me/${botName}?start=login`, '_blank');
     } catch (error) {
       console.error('Error during Telegram login:', error);
     }
   };
+
+  // Si nous sommes dans Telegram WebApp, ne pas afficher le bouton
+  if (window.Telegram?.WebApp) {
+    return null;
+  }
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
