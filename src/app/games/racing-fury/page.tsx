@@ -203,7 +203,6 @@ export default function RacingFuryGame() {
 
     return () => {
       if (currentContainer) {
-        // Nettoyage si nécessaire
         currentContainer.innerHTML = '';
       }
     };
