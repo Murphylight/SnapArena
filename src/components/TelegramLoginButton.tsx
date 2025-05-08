@@ -63,13 +63,23 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
     script.setAttribute('data-request-access', requestAccess ? 'write' : 'read');
     script.setAttribute('data-userpic', 'false');
     script.setAttribute('data-onauth', 'onTelegramAuth');
+    script.setAttribute('data-auth-url', window.location.origin);
+    script.setAttribute('data-lang', 'fr');
     script.async = true;
 
     window.onTelegramAuth = (user: TelegramUser) => {
       console.log('Telegram auth callback received:', user);
       console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+      console.log('Bot Name:', botName);
+      console.log('Request Access:', requestAccess);
+      
       loginWithTelegram(user).catch(error => {
         console.error('Error during Telegram login:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response
+        });
       });
       
       if (onAuth) {

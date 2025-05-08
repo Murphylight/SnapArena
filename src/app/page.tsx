@@ -73,12 +73,12 @@ export default function Home() {
                 <div className="mt-8">
                   <TelegramLoginButton
                     botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
-                    buttonSize="large"
-                    cornerRadius={8}
-                    requestAccess={true}
                     onAuth={(user) => {
                       console.log('Telegram auth successful:', user);
                     }}
+                    buttonSize="large"
+                    requestAccess={true}
+                    className="mt-4"
                   />
                 </div>
               )}
@@ -261,12 +261,12 @@ export default function Home() {
                 <div className="mt-8">
                   <TelegramLoginButton
                     botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
-                    buttonSize="large"
-                    cornerRadius={8}
-                    requestAccess={true}
                     onAuth={(user) => {
                       console.log('Telegram auth successful:', user);
                     }}
+                    buttonSize="large"
+                    requestAccess={true}
+                    className="mt-4"
                   />
                 </div>
               )}
