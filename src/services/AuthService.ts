@@ -29,7 +29,7 @@ export interface UserProfile {
 }
 
 // URL de l'API de validation Telegram
-const TELEGRAM_AUTH_API = process.env.NEXT_PUBLIC_API_URL || 'https://snaparena-api.vercel.app/api';
+const TELEGRAM_AUTH_API = process.env.NEXT_PUBLIC_API_URL || 'https://snap-arena-u2pj-qdcofvo7f-nonobundles-projects.vercel.app/';
 
 class AuthService {
   // Vérifier l'état de l'authentification

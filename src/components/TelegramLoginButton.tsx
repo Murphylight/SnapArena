@@ -67,6 +67,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 
     window.onTelegramAuth = (user: TelegramUser) => {
       console.log('Telegram auth callback received:', user);
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
       loginWithTelegram(user).catch(error => {
         console.error('Error during Telegram login:', error);
       });
