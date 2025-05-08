@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 240, 240, 240;
+  --background-end-rgb: 255, 255, 255;
+  --primary-color: 245, 158, 11; /* amber-500 */
+  --secondary-color: 234, 88, 12; /* orange-600 */
+  --border-color: 229, 231, 235; /* gray-200 */
+  --card-background: 255, 255, 255;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --input-background: 249, 250, 251;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 17, 24, 39; /* gray-900 */
+    --background-end-rgb: 0, 0, 0;
+    --border-color: 55, 65, 81; /* gray-700 */
+    --card-background: 31, 41, 55; /* gray-800 */
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --input-background: 31, 41, 55; /* gray-800 */
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+/* Pour le slider */
+.slick-prev:before, .slick-next:before {
+  color: rgb(var(--primary-color)) !important;
+}
+
+.slick-dots li button:before {
+  color: rgb(var(--primary-color)) !important;
+}
+
+/* Aspect ratio pour les images */
+.aspect-w-16 {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+}
+
+.aspect-w-16 > * {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}

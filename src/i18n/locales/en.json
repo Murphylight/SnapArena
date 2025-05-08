@@ -1,0 +1,112 @@
+{
+  "home": {
+    "slogan": "Compete. Win. Repeat.",
+    "login": "Login with Telegram",
+    "exploreGames": "Explore Games",
+    "whyChooseUs": "Why Choose SnapArena?",
+    "platformDescription": "The ultimate platform for competitive gaming with real rewards.",
+    "recentWinners": "Recent Winners",
+    "joinGames": "Join Games Now",
+    "readyToStart": "Ready to Start Winning?",
+    "joinToday": "Join SnapArena today and start competing for real rewards.",
+    "startPlaying": "Start Playing",
+    "features": {
+      "fast": {
+        "title": "Fast & Responsive",
+        "description": "Experience lightning-fast gameplay with top-notch responsiveness"
+      },
+      "rewards": {
+        "title": "Real Money Rewards",
+        "description": "Compete and win actual money that can be withdrawn directly to your account"
+      },
+      "global": {
+        "title": "Global Gaming",
+        "description": "Connect with players worldwide and compete in various Unity games"
+      },
+      "secure": {
+        "title": "Secure Betting",
+        "description": "All bets and transactions are securely processed and protected"
+      }
+    },
+    "slides": {
+      "1": {
+        "title": "Play Unity Games",
+        "description": "Access a variety of Unity WebGL games directly from your browser"
+      },
+      "2": {
+        "title": "Place Bets",
+        "description": "Challenge yourself by placing bets and win real money"
+      },
+      "3": {
+        "title": "Global Competition",
+        "description": "Compete with players from around the world"
+      },
+      "4": {
+        "title": "Instant Rewards",
+        "description": "Win and get your rewards instantly"
+      }
+    }
+  },
+  "games": {
+    "title": "Available Games",
+    "subtitle": "Choose a game to play and place your bets",
+    "backToGames": "Back to Games",
+    "joinGame": "Join Game",
+    "watchGame": "Watch Game",
+    "gameEnded": "Game Ended",
+    "minimumBet": "Minimum Bet",
+    "players": "Players",
+    "bettingPanel": "Betting Panel",
+    "totalPot": "Total Pot",
+    "yourBet": "Your Bet",
+    "waitingForPlayers": "Waiting for Players",
+    "minimumPlayersRequired": "Minimum {{count}} players required",
+    "currentPlayers": "Current Players: {{count}}",
+    "startingIn": "Game Starting In",
+    "gameFinished": "Game Finished",
+    "winnerIs": "Winner: {{name}}",
+    "playAgain": "Play Again",
+    "waitingForOtherPlayers": "Waiting for other players to join...",
+    "racingFury": {
+      "description": "High-speed racing game with obstacles and power-ups"
+    },
+    "status": {
+      "open": "Open",
+      "ongoing": "In Progress",
+      "completed": "Completed"
+    },
+    "errors": {
+      "minimumBet": "Minimum bet amount is {{amount}}"
+    }
+  },
+  "recentBets": {
+    "noResults": "No recent winners yet",
+    "winnerPot": "Winning amount"
+  },
+  "user": {
+    "profile": "My Profile",
+    "logout": "Log Out",
+    "balance": "Balance",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "history": "Game History",
+    "settings": "Settings",
+    "authentication": {
+      "failed": "Authentication failed",
+      "success": "Successfully logged in",
+      "logoutSuccess": "Successfully logged out"
+    }
+  },
+  "footer": {
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "country": {
+    "select": "Select your country",
+    "title": "Choose your country"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  }
+} 

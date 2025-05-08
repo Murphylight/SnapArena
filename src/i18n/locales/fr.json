@@ -1,0 +1,112 @@
+{
+  "home": {
+    "slogan": "Compétitionne. Gagne. Répète.",
+    "login": "Connexion avec Telegram",
+    "exploreGames": "Explorer les Jeux",
+    "whyChooseUs": "Pourquoi Choisir SnapArena ?",
+    "platformDescription": "La plateforme ultime pour les jeux compétitifs avec de vraies récompenses.",
+    "recentWinners": "Gagnants Récents",
+    "joinGames": "Rejoindre les Jeux Maintenant",
+    "readyToStart": "Prêt à Commencer à Gagner ?",
+    "joinToday": "Rejoignez SnapArena aujourd'hui et commencez à concourir pour de vraies récompenses.",
+    "startPlaying": "Commencer à Jouer",
+    "features": {
+      "fast": {
+        "title": "Rapide & Réactif",
+        "description": "Profitez d'un gameplay ultra rapide avec une réactivité de premier ordre"
+      },
+      "rewards": {
+        "title": "Récompenses en Argent Réel",
+        "description": "Participez et gagnez de l'argent réel qui peut être retiré directement sur votre compte"
+      },
+      "global": {
+        "title": "Jeu Global",
+        "description": "Connectez-vous avec des joueurs du monde entier et participez à divers jeux Unity"
+      },
+      "secure": {
+        "title": "Paris Sécurisés",
+        "description": "Tous les paris et transactions sont traités et protégés en toute sécurité"
+      }
+    },
+    "slides": {
+      "1": {
+        "title": "Jouer à des Jeux Unity",
+        "description": "Accédez à une variété de jeux Unity WebGL directement depuis votre navigateur"
+      },
+      "2": {
+        "title": "Placez des Paris",
+        "description": "Défiez-vous en plaçant des paris et gagnez de l'argent réel"
+      },
+      "3": {
+        "title": "Compétition Mondiale",
+        "description": "Compétitionnez avec des joueurs du monde entier"
+      },
+      "4": {
+        "title": "Récompenses Instantanées",
+        "description": "Gagnez et recevez vos récompenses instantanément"
+      }
+    }
+  },
+  "games": {
+    "title": "Jeux Disponibles",
+    "subtitle": "Choisissez un jeu pour jouer et placez vos paris",
+    "backToGames": "Retour aux Jeux",
+    "joinGame": "Rejoindre la Partie",
+    "watchGame": "Regarder la Partie",
+    "gameEnded": "Partie Terminée",
+    "minimumBet": "Mise Minimale",
+    "players": "Joueurs",
+    "bettingPanel": "Panneau de Paris",
+    "totalPot": "Cagnotte Totale",
+    "yourBet": "Votre Mise",
+    "waitingForPlayers": "En Attente de Joueurs",
+    "minimumPlayersRequired": "Minimum {{count}} joueurs requis",
+    "currentPlayers": "Joueurs actuels : {{count}}",
+    "startingIn": "La Partie Commence Dans",
+    "gameFinished": "Partie Terminée",
+    "winnerIs": "Gagnant : {{name}}",
+    "playAgain": "Rejouer",
+    "waitingForOtherPlayers": "En attente d'autres joueurs...",
+    "racingFury": {
+      "description": "Jeu de course à grande vitesse avec obstacles et bonus"
+    },
+    "status": {
+      "open": "Ouvert",
+      "ongoing": "En Cours",
+      "completed": "Terminé"
+    },
+    "errors": {
+      "minimumBet": "Le montant minimum de mise est de {{amount}}"
+    }
+  },
+  "recentBets": {
+    "noResults": "Pas encore de gagnants récents",
+    "winnerPot": "Montant gagné"
+  },
+  "user": {
+    "profile": "Mon Profil",
+    "logout": "Déconnexion",
+    "balance": "Solde",
+    "deposit": "Dépôt",
+    "withdraw": "Retrait",
+    "history": "Historique des Parties",
+    "settings": "Paramètres",
+    "authentication": {
+      "failed": "Échec de l'authentification",
+      "success": "Connexion réussie",
+      "logoutSuccess": "Déconnexion réussie"
+    }
+  },
+  "footer": {
+    "termsOfService": "Conditions d'Utilisation",
+    "privacyPolicy": "Politique de Confidentialité"
+  },
+  "country": {
+    "select": "Sélectionnez votre pays",
+    "title": "Choisissez votre pays"
+  },
+  "theme": {
+    "light": "Mode Clair",
+    "dark": "Mode Sombre"
+  }
+} 
