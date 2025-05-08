@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -19,11 +20,14 @@ export default function ProfilePage() {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
           <div className="flex items-center space-x-4">
             {profile.photoUrl ? (
-              <img
-                src={profile.photoUrl}
-                alt={profile.firstName}
-                className="h-16 w-16 rounded-full"
-              />
+              <div className="relative h-16 w-16">
+                <Image
+                  src={profile.photoUrl}
+                  alt={profile.firstName}
+                  fill
+                  className="rounded-full object-cover"
+                />
+              </div>
             ) : (
               <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
                 <span className="text-2xl text-gray-600 dark:text-gray-300">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 // Déclaration d'interface pour l'utilisateur Telegram
@@ -17,16 +17,12 @@ export interface TelegramUser {
 interface TelegramLoginButtonProps {
   botName: string;
   onAuth?: (user: TelegramUser) => void;
-  buttonSize?: 'large' | 'medium' | 'small';
-  requestAccess?: boolean;
   className?: string;
 }
 
 const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   botName,
   onAuth,
-  buttonSize = 'large',
-  requestAccess = true,
   className = '',
 }) => {
   const { loginWithTelegram, loading } = useAuth();

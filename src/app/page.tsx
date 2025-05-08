@@ -76,8 +76,6 @@ export default function Home() {
                     onAuth={(user) => {
                       console.log('Telegram auth successful:', user);
                     }}
-                    buttonSize="large"
-                    requestAccess={true}
                   />
                 </div>
               )}
@@ -263,8 +261,6 @@ export default function Home() {
                     onAuth={(user) => {
                       console.log('Telegram auth successful:', user);
                     }}
-                    buttonSize="large"
-                    requestAccess={true}
                   />
                 </div>
               )}
