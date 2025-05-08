@@ -46,14 +46,36 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
     const checkTelegramAuth = async () => {
       try {
         addLog('Checking Telegram WebApp...');
+        
+        // Vérifier si le script Telegram est chargé
+        if (typeof window.Telegram === 'undefined') {
+          addLog('Telegram script not loaded, adding it...');
+          const script = document.createElement('script');
+          script.src = 'https://telegram.org/js/telegram-web-app.js';
+          script.async = true;
+          document.body.appendChild(script);
+          
+          // Attendre que le script soit chargé
+          await new Promise((resolve) => {
+            script.onload = resolve;
+          });
+        }
+
         // Vérifier si nous sommes dans Telegram
         if (window.Telegram?.WebApp) {
           addLog('Telegram WebApp detected');
-          setIsInTelegram(true);
+          
+          // Initialiser le WebApp
           const webApp = window.Telegram.WebApp;
+          webApp.ready();
+          webApp.expand();
+          
+          addLog(`WebApp version: ${webApp.version}`);
+          addLog(`WebApp platform: ${webApp.platform}`);
           addLog(`WebApp initData: ${webApp.initData}`);
           addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
           
+          setIsInTelegram(true);
           const user = webApp.initDataUnsafe.user;
           
           if (user) {
@@ -81,6 +103,8 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           }
         } else {
           addLog('Not in Telegram WebApp');
+          addLog(`window.Telegram: ${typeof window.Telegram}`);
+          addLog(`window.Telegram?.WebApp: ${typeof window.Telegram?.WebApp}`);
         }
       } catch (error) {
         addLog(`Error: ${error instanceof Error ? error.message : String(error)}`);
