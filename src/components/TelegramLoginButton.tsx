@@ -21,6 +21,13 @@ interface TelegramLoginButtonProps {
   className?: string;
 }
 
+// Composant pour afficher les logs
+const DebugLog = ({ message }: { message: string }) => (
+  <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
+    <pre className="text-sm">{message}</pre>
+  </div>
+);
+
 const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   botName,
   onAuth,
@@ -29,18 +36,28 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   const { loginWithTelegram, loading } = useAuth();
   const router = useRouter();
   const [isInTelegram, setIsInTelegram] = useState(false);
+  const [debugLog, setDebugLog] = useState<string>('');
+
+  const addLog = (message: string) => {
+    setDebugLog(prev => `${new Date().toISOString()}: ${message}\n${prev}`);
+  };
 
   useEffect(() => {
     const checkTelegramAuth = async () => {
       try {
+        addLog('Checking Telegram WebApp...');
         // Vérifier si nous sommes dans Telegram
         if (window.Telegram?.WebApp) {
+          addLog('Telegram WebApp detected');
           setIsInTelegram(true);
           const webApp = window.Telegram.WebApp;
+          addLog(`WebApp initData: ${webApp.initData}`);
+          addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
+          
           const user = webApp.initDataUnsafe.user;
           
           if (user) {
-            console.log('User found in Telegram WebApp:', user);
+            addLog(`User found: ${JSON.stringify(user, null, 2)}`);
             const telegramUser: TelegramUser = {
               id: user.id,
               first_name: user.first_name,
@@ -50,15 +67,23 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
               hash: webApp.initData,
             };
             
+            addLog('Attempting to login with Telegram...');
             await loginWithTelegram(telegramUser);
+            addLog('Login successful');
+            
             if (onAuth) {
               onAuth(telegramUser);
             }
             // Rediriger vers la page de profil
             router.push('/profile');
+          } else {
+            addLog('No user data found in WebApp');
           }
+        } else {
+          addLog('Not in Telegram WebApp');
         }
       } catch (error) {
+        addLog(`Error: ${error instanceof Error ? error.message : String(error)}`);
         console.error('Error during automatic Telegram login:', error);
       }
     };
@@ -68,7 +93,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 
   // Si nous sommes dans Telegram, ne pas afficher le bouton
   if (isInTelegram) {
-    return null;
+    return <DebugLog message={debugLog} />;
   }
 
   return (
@@ -77,7 +102,10 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
       ) : (
         <button
-          onClick={() => window.open(`https://t.me/${botName}?start=login`, '_blank')}
+          onClick={() => {
+            addLog('Login button clicked');
+            window.open(`https://t.me/${botName}?start=login`, '_blank');
+          }}
           className="bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-2 px-4 rounded flex items-center space-x-2"
         >
           <svg
@@ -91,6 +119,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           <span>Se connecter avec Telegram</span>
         </button>
       )}
+      <DebugLog message={debugLog} />
     </div>
   );
 };
