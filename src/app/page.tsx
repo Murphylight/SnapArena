@@ -11,7 +11,7 @@ import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
-import TelegramWebAppButton from '@/components/TelegramWebAppButton';
+import TelegramLoginButton from '@/components/TelegramLoginButton';
 
 // Animation variants
 const fadeInUp = {
@@ -36,7 +36,7 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   return (
     <div className="min-h-screen">
@@ -69,9 +69,16 @@ export default function Home() {
               {t('home.slogan')}
             </p>
             <div className="mt-10 space-y-6">
-              {!profile && (
-                <div className="mt-8">
-                  <TelegramWebAppButton />
+              {!profile && !user && (
+                <div className="mt-8 flex justify-center">
+                  <TelegramLoginButton
+                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
+                    onAuth={(user) => {
+                      console.log('Telegram auth successful:', user);
+                    }}
+                    buttonSize="large"
+                    requestAccess={true}
+                  />
                 </div>
               )}
               {!profile ? (
@@ -249,9 +256,16 @@ export default function Home() {
               {t('home.joinToday')}
             </p>
             <div className="mt-8">
-              {!profile && (
-                <div className="mt-8">
-                  <TelegramWebAppButton />
+              {!profile && !user && (
+                <div className="mt-8 flex justify-center">
+                  <TelegramLoginButton
+                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
+                    onAuth={(user) => {
+                      console.log('Telegram auth successful:', user);
+                    }}
+                    buttonSize="large"
+                    requestAccess={true}
+                  />
                 </div>
               )}
               {!profile ? (
