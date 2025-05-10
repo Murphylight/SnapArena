@@ -69,6 +69,11 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           addLog('Telegram WebApp detected with user data');
           
           // Initialiser le WebApp
+          if (!window.Telegram?.WebApp) {
+            addLog('Telegram WebApp not available');
+            return;
+          }
+          
           const webApp = window.Telegram.WebApp;
           webApp.ready();
           webApp.expand();
