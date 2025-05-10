@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import crypto from 'crypto';
-import { TelegramUser } from '@/components/TelegramLoginButton';
+import { TelegramUser } from '@/types/telegram';
 
 // Initialiser Firebase Admin
 if (!getApps().length) {
