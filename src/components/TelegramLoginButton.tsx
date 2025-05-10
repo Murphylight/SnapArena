@@ -3,17 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-
-// Déclaration d'interface pour l'utilisateur Telegram
-export interface TelegramUser {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-  auth_date: number;
-  hash: string;
-}
+import { TelegramUser } from '@/types/telegram';
 
 // Interface pour Telegram WebApp
 declare global {
@@ -72,23 +62,12 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
       try {
         addLog('Checking Telegram WebApp...');
         
-        // Vérifier si le script Telegram est chargé
-        if (typeof window.Telegram === 'undefined') {
-          addLog('Telegram script not loaded, adding it...');
-          const script = document.createElement('script');
-          script.src = 'https://telegram.org/js/telegram-web-app.js';
-          script.async = true;
-          document.body.appendChild(script);
-          
-          // Attendre que le script soit chargé
-          await new Promise((resolve) => {
-            script.onload = resolve;
-          });
-        }
-
         // Vérifier si nous sommes dans Telegram
-        if (window.Telegram?.WebApp) {
-          addLog('Telegram WebApp detected');
+        const isTelegramWebApp = window.Telegram?.WebApp?.initDataUnsafe?.user !== undefined;
+        addLog(`Is Telegram WebApp: ${isTelegramWebApp}`);
+        
+        if (isTelegramWebApp) {
+          addLog('Telegram WebApp detected with user data');
           
           // Initialiser le WebApp
           const webApp = window.Telegram.WebApp;
@@ -98,7 +77,6 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
           addLog(`WebApp initData: ${webApp.initData}`);
           addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
           
-          setIsInTelegram(true);
           const user = webApp.initDataUnsafe.user;
           
           if (user) {
@@ -125,9 +103,10 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
             addLog('No user data found in WebApp');
           }
         } else {
-          addLog('Not in Telegram WebApp');
+          addLog('Not in Telegram WebApp or no user data available');
           addLog(`window.Telegram: ${typeof window.Telegram}`);
           addLog(`window.Telegram?.WebApp: ${typeof window.Telegram?.WebApp}`);
+          addLog(`window.Telegram?.WebApp?.initDataUnsafe: ${JSON.stringify(window.Telegram?.WebApp?.initDataUnsafe)}`);
         }
       } catch (error) {
         addLog(`Error: ${error instanceof Error ? error.message : String(error)}`);

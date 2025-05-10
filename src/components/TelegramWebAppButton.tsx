@@ -1,166 +1,100 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import Script from 'next/script';
+import { TelegramUser } from '@/types/telegram';
 
-interface TelegramWebApp {
-  initData: string;
-  initDataUnsafe: {
-    user?: {
-      id: number;
-      first_name: string;
-      last_name?: string;
-      username?: string;
-      language_code?: string;
-    };
-  };
-  ready: () => void;
-  expand: () => void;
-  close: () => void;
-  MainButton: {
-    show: () => void;
-    hide: () => void;
-    setText: (text: string) => void;
-    onClick: (callback: () => void) => void;
-  };
+interface TelegramWebAppButtonProps {
+  className?: string;
 }
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp?: TelegramWebApp;
-    };
-  }
-}
-
+// Composant pour afficher les logs
 const DebugLog = ({ message }: { message: string }) => (
-  <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-    {message}
+  <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
+    <pre className="text-sm">{message}</pre>
   </div>
 );
 
-const TelegramWebAppButton = () => {
-  const { loginWithTelegram } = useAuth();
+const TelegramWebAppButton: React.FC<TelegramWebAppButtonProps> = ({
+  className = '',
+}) => {
+  const { loginWithTelegram, loading } = useAuth();
   const router = useRouter();
-  const [logs, setLogs] = useState<string[]>([]);
+  const [debugLog, setDebugLog] = useState<string>('');
 
   const addLog = (message: string) => {
-    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setDebugLog(prev => `${new Date().toISOString()}: ${message}\n${prev}`);
   };
 
   useEffect(() => {
-    addLog('TelegramWebAppButton mounted');
-    const webApp = window.Telegram?.WebApp;
-    addLog(`WebApp available: ${!!webApp}`);
-    
-    if (webApp) {
-      addLog('Initializing WebApp');
-      webApp.ready();
-      webApp.expand();
+    const initTelegramWebApp = async () => {
+      try {
+        addLog('Initializing Telegram WebApp...');
+        
+        // Vérifier si le script Telegram est chargé
+        if (typeof window.Telegram === 'undefined') {
+          addLog('Telegram script not loaded, adding it...');
+          const script = document.createElement('script');
+          script.src = 'https://telegram.org/js/telegram-web-app.js';
+          script.async = true;
+          document.body.appendChild(script);
+          
+          // Attendre que le script soit chargé
+          await new Promise((resolve) => {
+            script.onload = resolve;
+          });
+        }
 
-      addLog('Configuring MainButton');
-      webApp.MainButton.setText('Se connecter');
-      webApp.MainButton.show();
-
-      webApp.MainButton.onClick(async () => {
-        addLog('MainButton clicked');
-        if (webApp.initDataUnsafe.user) {
-          addLog(`User data available: ${JSON.stringify(webApp.initDataUnsafe.user)}`);
-          const user = {
-            id: webApp.initDataUnsafe.user.id,
-            first_name: webApp.initDataUnsafe.user.first_name,
-            last_name: webApp.initDataUnsafe.user.last_name,
-            username: webApp.initDataUnsafe.user.username,
-            auth_date: Math.floor(Date.now() / 1000),
-            hash: webApp.initData,
-          };
-
-          try {
-            addLog('Attempting to login with Telegram');
-            await loginWithTelegram(user);
-            addLog('Login successful, redirecting to profile');
+        // Vérifier si nous sommes dans Telegram
+        if (window.Telegram?.WebApp) {
+          addLog('Telegram WebApp detected');
+          
+          // Initialiser le WebApp
+          const webApp = window.Telegram.WebApp;
+          webApp.ready();
+          webApp.expand();
+          
+          addLog(`WebApp initData: ${webApp.initData}`);
+          addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
+          
+          const user = webApp.initDataUnsafe.user;
+          
+          if (user) {
+            addLog(`User found: ${JSON.stringify(user, null, 2)}`);
+            const telegramUser: TelegramUser = {
+              id: user.id,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              username: user.username,
+              auth_date: Math.floor(Date.now() / 1000),
+              hash: webApp.initData,
+            };
+            
+            addLog('Attempting to login with Telegram...');
+            await loginWithTelegram(telegramUser);
+            addLog('Login successful');
+            
+            // Rediriger vers la page de profil
             router.push('/profile');
-          } catch (error) {
-            addLog(`Error during Telegram login: ${error}`);
+          } else {
+            addLog('No user data found in WebApp');
           }
         } else {
-          addLog('No user data available in initDataUnsafe');
+          addLog('Not in Telegram WebApp');
+          addLog(`window.Telegram: ${typeof window.Telegram}`);
+          addLog(`window.Telegram?.WebApp: ${typeof window.Telegram?.WebApp}`);
         }
-      });
-    }
-
-    return () => {
-      if (webApp) {
-        addLog('Cleaning up WebApp');
-        webApp.MainButton.hide();
+      } catch (error) {
+        addLog(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        console.error('Error during Telegram WebApp initialization:', error);
       }
     };
+
+    initTelegramWebApp();
   }, [loginWithTelegram, router]);
 
-  // Si nous sommes dans Telegram Web App, ne pas afficher le bouton
-  if (window.Telegram?.WebApp) {
-    console.log('Running inside Telegram WebApp, not showing button');
-    return null;
-  }
-
-  // Sinon, afficher le bouton normal
-  return (
-    <div className="space-y-4">
-      <Script
-        src="https://telegram.org/js/telegram-web-app.js"
-        strategy="beforeInteractive"
-        onLoad={() => addLog('Telegram script loaded')}
-        onError={(e) => addLog(`Error loading Telegram script: ${e}`)}
-      />
-      
-      {!window.Telegram?.WebApp && (
-        <button
-          className="bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold py-2 px-4 rounded"
-          onClick={() => {
-            addLog('Button clicked');
-            const webApp = window.Telegram?.WebApp;
-            addLog(`WebApp available in click handler: ${!!webApp}`);
-            
-            if (webApp && webApp.initDataUnsafe.user) {
-              addLog(`User data available in click handler: ${JSON.stringify(webApp.initDataUnsafe.user)}`);
-              const user = {
-                id: webApp.initDataUnsafe.user.id,
-                first_name: webApp.initDataUnsafe.user.first_name,
-                last_name: webApp.initDataUnsafe.user.last_name,
-                username: webApp.initDataUnsafe.user.username,
-                auth_date: Math.floor(Date.now() / 1000),
-                hash: webApp.initData,
-              };
-              addLog('Attempting to login with Telegram');
-              loginWithTelegram(user)
-                .then(() => {
-                  addLog('Login successful');
-                  router.push('/profile');
-                })
-                .catch(error => {
-                  addLog(`Error during Telegram login: ${error}`);
-                });
-            } else {
-              addLog('No user data available in click handler');
-            }
-          }}
-        >
-          Se connecter avec Telegram
-        </button>
-      )}
-
-      <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <h3 className="text-lg font-semibold mb-2">Logs de débogage :</h3>
-        <div className="space-y-1">
-          {logs.map((log, index) => (
-            <DebugLog key={index} message={log} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <DebugLog message={debugLog} />;
 };
 
 export default TelegramWebAppButton; 
