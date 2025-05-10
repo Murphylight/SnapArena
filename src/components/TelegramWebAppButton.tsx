@@ -5,10 +5,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { TelegramUser } from '@/types/telegram';
 
-interface TelegramWebAppButtonProps {
-  className?: string;
-}
-
 // Composant pour afficher les logs
 const DebugLog = ({ message }: { message: string }) => (
   <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
@@ -16,10 +12,8 @@ const DebugLog = ({ message }: { message: string }) => (
   </div>
 );
 
-const TelegramWebAppButton: React.FC<TelegramWebAppButtonProps> = ({
-  className = '',
-}) => {
-  const { loginWithTelegram, loading } = useAuth();
+const TelegramWebAppButton: React.FC = () => {
+  const { loginWithTelegram } = useAuth();
   const router = useRouter();
   const [debugLog, setDebugLog] = useState<string>('');
 

@@ -50,7 +50,6 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 }) => {
   const { loginWithTelegram, loading } = useAuth();
   const router = useRouter();
-  const [isInTelegram, setIsInTelegram] = useState(false);
   const [debugLog, setDebugLog] = useState<string>('');
 
   const addLog = (message: string) => {
@@ -116,11 +115,6 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
 
     checkTelegramAuth();
   }, [loginWithTelegram, onAuth, router]);
-
-  // Si nous sommes dans Telegram, ne pas afficher le bouton
-  if (isInTelegram) {
-    return <DebugLog message={debugLog} />;
-  }
 
   return (
     <div className={`flex flex-col items-center ${className}`}>

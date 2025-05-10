@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CountryCode, countryToLanguage, countryCurrencies, Currency } from '@/i18n';
 import { getGeoLocation } from '@/services/GeoLocationService';
@@ -30,7 +30,7 @@ export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ chi
   const [currency, setCurrency] = useState<Currency>(countryCurrencies[defaultCountry]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const setCountry = (newCountry: CountryCode) => {
+  const setCountry = useCallback((newCountry: CountryCode) => {
     setCountryState(newCountry);
     
     const newLanguage = countryToLanguage[newCountry] || 'en';
@@ -42,7 +42,7 @@ export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ chi
     if (typeof window !== 'undefined') {
       localStorage.setItem('userCountry', newCountry);
     }
-  };
+  }, [i18n]);
 
   useEffect(() => {
     const initializeUserPreferences = async () => {
@@ -72,7 +72,7 @@ export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ chi
     };
 
     initializeUserPreferences();
-  }, []);
+  }, [setCountry]);
 
   useEffect(() => {
     const detectCountry = async () => {
