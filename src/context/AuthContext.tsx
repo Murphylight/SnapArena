@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User as FirebaseUser } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import authService, { UserProfile } from '@/services/AuthService';
-import { TelegramUser } from '@/components/TelegramLoginButton';
+import { TelegramUser } from '@/types/telegram';
 
 interface AuthContextType {
   user: FirebaseUser | null;
