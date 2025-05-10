@@ -13,7 +13,7 @@ import {
   updateDoc,
   Timestamp 
 } from 'firebase/firestore';
-import { TelegramUser } from '@/components/TelegramLoginButton';
+import type { TelegramUser } from '@/types/telegram';
 
 // Types
 export interface UserProfile {
