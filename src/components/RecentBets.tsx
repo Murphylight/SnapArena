@@ -6,126 +6,99 @@ import { motion } from 'framer-motion';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import bettingService, { BetResult } from '@/services/BettingService';
 import { Timestamp } from 'firebase/firestore';
+import { formatCurrency } from '@/utils/currency';
 
-// Animation variants
-const fadeInRight = {
-  hidden: { opacity: 0, x: 50 },
-  visible: { opacity: 1, x: 0 },
-};
-
-const staggerContainer = {
+// Animation variants / Variantes d'animation
+const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-    },
-  },
+      staggerChildren: 0.1
+    }
+  }
 };
 
-interface RecentBetsProps {
-  limit?: number;
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1
+  }
+};
+
+interface Bet {
+  id: string;
+  gameName: string;
+  amount: number;
+  status: 'won' | 'lost' | 'pending';
+  timestamp: Date;
 }
 
-const RecentBets: React.FC<RecentBetsProps> = ({ limit = 5 }) => {
+interface RecentBetsProps {
+  bets: Bet[];
+}
+
+const RecentBets: React.FC<RecentBetsProps> = ({ bets }) => {
   const { t } = useTranslation();
-  const { currency } = useUserPreferences();
-  const [results, setResults] = useState<BetResult[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { preferences } = useUserPreferences();
 
-  useEffect(() => {
-    const fetchRecentResults = async () => {
-      try {
-        setIsLoading(true);
-        const recentResults = await bettingService.getRecentResults(limit);
-        setResults(recentResults);
-      } catch (error) {
-        console.error('Error fetching recent results:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRecentResults();
-  }, [limit]);
-
-  // Format de la devise
-  const formatCurrency = (amount: number) => {
-    return `${amount} ${currency.symbol}`;
+  // Currency format / Format de la devise
+  const formatAmount = (amount: number) => {
+    return formatCurrency(amount, preferences.currency);
   };
 
-  // Format de la date
-  const formatDate = (timestamp: Timestamp | undefined) => {
-    if (!timestamp) return '';
-    
-    try {
-      const date = new Date(timestamp.toMillis());
-      return new Intl.DateTimeFormat(undefined, {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(date);
-    } catch {
-      return '';
-    }
+  // Date format / Format de la date
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat(preferences.language, {
+      dateStyle: 'short',
+      timeStyle: 'short'
+    }).format(date);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-500"></div>
-      </div>
-    );
-  }
-
-  if (results.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        {t('recentBets.noResults')}
-      </div>
-    );
-  }
 
   return (
     <motion.div
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
+      variants={containerVariants}
       initial="hidden"
       animate="visible"
-      variants={staggerContainer}
-      className="overflow-hidden"
     >
-      <div className="space-y-3">
-        {results.map((result, index) => (
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        {t('bets.recent')}
+      </h2>
+      <div className="space-y-4">
+        {bets.map((bet) => (
           <motion.div
-            key={result.id || index}
-            variants={fadeInRight}
-            transition={{ duration: 0.3 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 overflow-hidden"
+            key={bet.id}
+            className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+            variants={itemVariants}
           >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-amber-600 dark:text-amber-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {result.winnerName}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDate(result.timestamp)}
-                  </p>
-                </div>
+            <div className="flex items-center space-x-4">
+              <div className={`p-2 rounded-full ${
+                bet.status === 'won' ? 'bg-green-100 dark:bg-green-900' :
+                bet.status === 'lost' ? 'bg-red-100 dark:bg-red-900' :
+                'bg-yellow-100 dark:bg-yellow-900'
+              }`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                  {formatCurrency(result.potAmount)}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('recentBets.winnerPot')}
-                </p>
+              <div>
+                <p className="font-medium text-gray-900 dark:text-white">{bet.gameName}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(bet.timestamp)}</p>
               </div>
+            </div>
+            <div className="text-right">
+              <p className={`font-medium ${
+                bet.status === 'won' ? 'text-green-600 dark:text-green-400' :
+                bet.status === 'lost' ? 'text-red-600 dark:text-red-400' :
+                'text-yellow-600 dark:text-yellow-400'
+              }`}>
+                {formatAmount(bet.amount)}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t(`bets.status.${bet.status}`)}
+              </p>
             </div>
           </motion.div>
         ))}

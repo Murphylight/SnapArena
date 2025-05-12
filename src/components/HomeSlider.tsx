@@ -2,32 +2,59 @@
 
 import React, { useEffect } from 'react';
 import Slider from 'react-slick';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Image from 'next/image';
 
+// Ensure styles are loaded / Assurer que les styles sont chargés
+useEffect(() => {
+  const linkElement = document.createElement('link');
+  linkElement.rel = 'stylesheet';
+  linkElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css';
+  document.head.appendChild(linkElement);
+
+  const linkThemeElement = document.createElement('link');
+  linkThemeElement.rel = 'stylesheet';
+  linkThemeElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css';
+  document.head.appendChild(linkThemeElement);
+
+  return () => {
+    document.head.removeChild(linkElement);
+    document.head.removeChild(linkThemeElement);
+  };
+}, []);
+
 const HomeSlider: React.FC = () => {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    // Assurer que les styles sont chargés
-    const linkElement = document.createElement('link');
-    linkElement.rel = 'stylesheet';
-    linkElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css';
-    document.head.appendChild(linkElement);
-
-    const linkThemeElement = document.createElement('link');
-    linkThemeElement.rel = 'stylesheet';
-    linkThemeElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css';
-    document.head.appendChild(linkThemeElement);
-
-    return () => {
-      document.head.removeChild(linkElement);
-      document.head.removeChild(linkThemeElement);
-    };
-  }, []);
+  const slides = [
+    {
+      title: t('slider.unityGames.title'),
+      description: t('slider.unityGames.description'),
+      image: 'https://via.placeholder.com/800x600/FF5733/FFFFFF?text=Unity+Games',
+      link: '/games'
+    },
+    {
+      title: t('slider.placeBets.title'),
+      description: t('slider.placeBets.description'),
+      image: 'https://via.placeholder.com/800x600/33FF57/FFFFFF?text=Place+Bets',
+      link: '/betting'
+    },
+    {
+      title: t('slider.globalCompetition.title'),
+      description: t('slider.globalCompetition.description'),
+      image: 'https://via.placeholder.com/800x600/3357FF/FFFFFF?text=Global+Competition',
+      link: '/competition'
+    },
+    {
+      title: t('slider.instantRewards.title'),
+      description: t('slider.instantRewards.description'),
+      image: 'https://via.placeholder.com/800x600/FF33A8/FFFFFF?text=Instant+Rewards',
+      link: '/rewards'
+    }
+  ];
 
   const settings = {
     dots: true,
@@ -37,68 +64,40 @@ const HomeSlider: React.FC = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 5000,
-    pauseOnHover: true,
-    adaptiveHeight: true,
-    arrows: true,
+    pauseOnHover: true
   };
 
-  const sliderItems = [
-    {
-      id: 1,
-      title: t('home.slides.1.title'),
-      description: t('home.slides.1.description'),
-      image: 'https://via.placeholder.com/800x600/FF5733/FFFFFF?text=Unity+Games',
-    },
-    {
-      id: 2,
-      title: t('home.slides.2.title'),
-      description: t('home.slides.2.description'),
-      image: 'https://via.placeholder.com/800x600/33FF57/FFFFFF?text=Place+Bets',
-    },
-    {
-      id: 3,
-      title: t('home.slides.3.title'),
-      description: t('home.slides.3.description'),
-      image: 'https://via.placeholder.com/800x600/3357FF/FFFFFF?text=Global+Competition',
-    },
-    {
-      id: 4,
-      title: t('home.slides.4.title'),
-      description: t('home.slides.4.description'),
-      image: 'https://via.placeholder.com/800x600/FF33A8/FFFFFF?text=Instant+Rewards',
-    },
-  ];
-
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8">
+    <div className="relative">
       <Slider {...settings}>
-        {sliderItems.map((item) => (
-          <div key={item.id} className="outline-none">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-            >
-              <div className="relative h-64 w-full">
-                <Image
-                  src={item.image}
-                  alt={t(item.title)}
-                  fill
-                  className="object-cover rounded-lg"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+        {slides.map((slide, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="relative h-[400px] md:h-[500px]">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div className="text-center text-white p-4">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4">{slide.title}</h2>
+                  <p className="text-lg md:text-xl mb-8">{slide.description}</p>
+                  <a
+                    href={slide.link}
+                    className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                  >
+                    {t('common.learnMore')}
+                  </a>
+                </div>
               </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300">
-                  {item.description}
-                </p>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         ))}
       </Slider>
     </div>

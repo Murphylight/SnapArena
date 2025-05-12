@@ -1,23 +1,25 @@
-// Import Firebase modules
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+// Import Firebase modules / Importer les modules Firebase
+import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-// Firebase configuration
+// Firebase configuration / Configuration Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyCDUc2kbMR_XK6OKitWHaHwuwCtnRWGYgw",
-  authDomain: "tournaments-ee5af.firebaseapp.com",
-  projectId: "tournaments-ee5af",
-  storageBucket: "tournaments-ee5af.firebasestorage.app",
-  messagingSenderId: "768990935465",
-  appId: "1:768990935465:web:fcb3d316a99009c9636cb8",
-  measurementId: "G-3GTZK84KSF"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+// Initialize Firebase / Initialiser Firebase
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-export { db, auth };
+// Initialize services / Initialiser les services
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Export services / Exporter les services
+export { auth, db };
 export default app; 

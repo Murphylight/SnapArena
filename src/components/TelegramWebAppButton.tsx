@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { TelegramUser } from '@/types/telegram';
 
-// Composant pour afficher les logs
+// Component to display logs / Composant pour afficher les logs
 const DebugLog = ({ message }: { message: string }) => (
   <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
     <pre className="text-sm">{message}</pre>
@@ -26,7 +26,7 @@ const TelegramWebAppButton: React.FC = () => {
       try {
         addLog('Initializing Telegram WebApp...');
         
-        // Vérifier si le script Telegram est chargé
+        // Check if Telegram script is loaded / Vérifier si le script Telegram est chargé
         if (typeof window.Telegram === 'undefined') {
           addLog('Telegram script not loaded, adding it...');
           const script = document.createElement('script');
@@ -34,17 +34,17 @@ const TelegramWebAppButton: React.FC = () => {
           script.async = true;
           document.body.appendChild(script);
           
-          // Attendre que le script soit chargé
+          // Wait for script to load / Attendre que le script soit chargé
           await new Promise((resolve) => {
             script.onload = resolve;
           });
         }
 
-        // Vérifier si nous sommes dans Telegram
+        // Check if we're in Telegram / Vérifier si nous sommes dans Telegram
         if (window.Telegram?.WebApp) {
           addLog('Telegram WebApp detected');
           
-          // Initialiser le WebApp
+          // Initialize WebApp / Initialiser le WebApp
           const webApp = window.Telegram.WebApp;
           webApp.ready();
           webApp.expand();
@@ -69,7 +69,7 @@ const TelegramWebAppButton: React.FC = () => {
             await loginWithTelegram(telegramUser);
             addLog('Login successful');
             
-            // Rediriger vers la page de profil
+            // Redirect to profile page / Rediriger vers la page de profil
             router.push('/profile');
           } else {
             addLog('No user data found in WebApp');

@@ -1,46 +1,53 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useTheme } from 'next-themes';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  isDarkMode: false,
-  toggleTheme: () => {},
-});
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { theme, setTheme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>('system');
 
-  // Après le montage du composant, nous pouvons accéder à window
+  // After component mount, we can access window / Après le montage du composant, nous pouvons accéder à window
   useEffect(() => {
-    setMounted(true);
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
   }, []);
 
-  // Mettre à jour l'état local quand le thème change
+  // Update local state when theme changes / Mettre à jour l'état local quand le thème change
   useEffect(() => {
-    if (mounted) {
-      setIsDarkMode(theme === 'dark');
+    localStorage.setItem('theme', theme);
+    document.documentElement.classList.remove('light', 'dark');
+    
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.classList.add(systemTheme);
+    } else {
+      document.documentElement.classList.add(theme);
     }
-  }, [theme, mounted]);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
-
-export const useThemeContext = () => useContext(ThemeContext);
 
 export default ThemeContext; 

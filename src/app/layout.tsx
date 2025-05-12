@@ -4,8 +4,10 @@ import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import Footer from '@/components/Footer';
 
+// Initialize Inter font / Initialiser la police Inter
 const inter = Inter({ subsets: ['latin'] });
 
+// Metadata for the application / Métadonnées pour l'application
 export const metadata: Metadata = {
   title: 'SnapArena - Compete. Win. Repeat.',
   description: 'Play Unity WebGL games and win real money on SnapArena.',
@@ -23,6 +25,7 @@ export const viewport: Viewport = {
   ],
 };
 
+// Root layout component / Composant de mise en page racine
 export default function RootLayout({
   children,
 }: {

@@ -15,7 +15,7 @@ import {
 } from 'firebase/firestore';
 import type { TelegramUser } from '@/types/telegram';
 
-// Types
+// Types / Types
 export interface UserProfile {
   uid: string;
   telegramId: number;
@@ -28,11 +28,11 @@ export interface UserProfile {
   createdAt: Timestamp;
 }
 
-// URL de l'API de validation Telegram
+// Telegram Auth API URL / URL de l'API d'authentification Telegram
 const TELEGRAM_AUTH_API = process.env.NEXT_PUBLIC_API_URL || 'https://snap-arena-5meo.vercel.app';
 
 class AuthService {
-  // Vérifier l'état de l'authentification
+  // Check authentication state / Vérifier l'état de l'authentification
   getCurrentUser(): Promise<FirebaseUser | null> {
     return new Promise((resolve) => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -42,7 +42,7 @@ class AuthService {
     });
   }
 
-  // Vérifier l'authentification Telegram
+  // Validate Telegram authentication / Vérifier l'authentification Telegram
   async validateTelegramLogin(telegramUser: TelegramUser): Promise<string> {
     try {
       console.log('Validating Telegram login with:', telegramUser);
@@ -71,24 +71,24 @@ class AuthService {
     }
   }
 
-  // Se connecter avec Telegram
+  // Login with Telegram / Se connecter avec Telegram
   async loginWithTelegram(telegramUser: TelegramUser): Promise<UserProfile> {
     try {
-      // Valider l'authentification Telegram et obtenir un token Firebase
+      // Validate Telegram auth and get Firebase token / Valider l'authentification Telegram et obtenir un token Firebase
       const customToken = await this.validateTelegramLogin(telegramUser);
       
-      // Se connecter à Firebase avec le token personnalisé
+      // Sign in to Firebase with custom token / Se connecter à Firebase avec le token personnalisé
       const userCredential = await signInWithCustomToken(auth, customToken);
       const { user } = userCredential;
       
-      // Vérifier si l'utilisateur existe déjà dans Firestore
+      // Check if user exists in Firestore / Vérifier si l'utilisateur existe déjà dans Firestore
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
       
       let userProfile: UserProfile;
       
       if (userSnap.exists()) {
-        // Mettre à jour les informations de connexion
+        // Update login information / Mettre à jour les informations de connexion
         userProfile = userSnap.data() as UserProfile;
         await updateDoc(userRef, {
           lastLoginAt: serverTimestamp(),
@@ -98,7 +98,7 @@ class AuthService {
           photoUrl: telegramUser.photo_url || '',
         });
       } else {
-        // Créer un nouveau profil utilisateur
+        // Create new user profile / Créer un nouveau profil utilisateur
         userProfile = {
           uid: user.uid,
           telegramId: telegramUser.id,
@@ -121,7 +121,7 @@ class AuthService {
     }
   }
 
-  // Se déconnecter
+  // Logout / Se déconnecter
   async logout(): Promise<void> {
     try {
       await signOut(auth);
@@ -131,7 +131,7 @@ class AuthService {
     }
   }
 
-  // Obtenir le profil utilisateur
+  // Get user profile / Obtenir le profil utilisateur
   async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
       const userRef = doc(db, 'users', uid);

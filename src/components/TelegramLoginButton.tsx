@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { TelegramUser } from '@/types/telegram';
 
-// Interface pour Telegram WebApp
+// Interface for Telegram WebApp / Interface pour Telegram WebApp
 declare global {
   interface Window {
     Telegram?: {
@@ -36,7 +36,7 @@ interface TelegramLoginButtonProps {
   className?: string;
 }
 
-// Composant pour afficher les logs
+// Component to display logs / Composant pour afficher les logs
 const DebugLog = ({ message }: { message: string }) => (
   <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
     <pre className="text-sm">{message}</pre>
@@ -57,18 +57,49 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
   };
 
   useEffect(() => {
+    const loadTelegramScript = async () => {
+      try {
+        addLog('Loading Telegram script...');
+        
+        // Check if script is already loaded / Vérifier si le script est déjà chargé
+        if (typeof window.Telegram !== 'undefined') {
+          addLog('Telegram script already loaded');
+          return;
+        }
+
+        // Create and load script / Créer et charger le script
+        const script = document.createElement('script');
+        script.src = 'https://telegram.org/js/telegram-web-app.js';
+        script.async = true;
+        
+        // Wait for script to load / Attendre que le script soit chargé
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+        
+        addLog('Telegram script loaded successfully');
+      } catch (error) {
+        addLog(`Error loading Telegram script: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    };
+
     const checkTelegramAuth = async () => {
       try {
         addLog('Checking Telegram WebApp...');
         
-        // Vérifier si nous sommes dans Telegram
+        // Ensure script is loaded / S'assurer que le script est chargé
+        await loadTelegramScript();
+        
+        // Check if we're in Telegram / Vérifier si nous sommes dans Telegram
         const isTelegramWebApp = window.Telegram?.WebApp?.initDataUnsafe?.user !== undefined;
         addLog(`Is Telegram WebApp: ${isTelegramWebApp}`);
         
         if (isTelegramWebApp) {
           addLog('Telegram WebApp detected with user data');
           
-          // Initialiser le WebApp
+          // Initialize WebApp / Initialiser le WebApp
           if (!window.Telegram?.WebApp) {
             addLog('Telegram WebApp not available');
             return;
@@ -101,7 +132,7 @@ const TelegramLoginButton: React.FC<TelegramLoginButtonProps> = ({
             if (onAuth) {
               onAuth(telegramUser);
             }
-            // Rediriger vers la page de profil
+            // Redirect to profile page / Rediriger vers la page de profil
             router.push('/profile');
           } else {
             addLog('No user data found in WebApp');

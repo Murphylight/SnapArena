@@ -4,152 +4,123 @@ import React from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
-// Interface pour un match
+// Interface for match data / Interface pour les données de match
 interface Match {
   id: string;
-  date: string;
-  game: string;
+  opponent: string;
   result: 'win' | 'loss' | 'draw';
-  amount: number;
+  date: string;
+  score: string;
 }
 
-// Données de test pour l'historique des matchs
+// Mock data for match history / Données fictives pour l'historique des matchs
 const mockMatches: Match[] = [
   {
     id: '1',
-    date: '2024-03-20',
-    game: 'Snap Battle',
+    opponent: 'John Doe',
     result: 'win',
-    amount: 100,
+    date: '2024-03-15',
+    score: '3-1'
   },
   {
     id: '2',
-    date: '2024-03-19',
-    game: 'Snap Battle',
+    opponent: 'Jane Smith',
     result: 'loss',
-    amount: -50,
+    date: '2024-03-14',
+    score: '1-2'
   },
   {
     id: '3',
-    date: '2024-03-18',
-    game: 'Snap Battle',
-    result: 'win',
-    amount: 75,
-  },
+    opponent: 'Mike Johnson',
+    result: 'draw',
+    date: '2024-03-13',
+    score: '2-2'
+  }
 ];
 
-export default function ProfilePage() {
-  const { profile, user } = useAuth();
+// Profile page component / Composant de la page de profil
+const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
+  const { profile, loading } = useAuth();
   const router = useRouter();
 
-  if (!profile || !user) {
-    router.push('/');
-    return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl text-gray-600 dark:text-gray-400">
+          {t('profile.notLoggedIn')}
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Carte de profil */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-          <div className="flex items-center space-x-4">
-            {profile.photoUrl ? (
-              <div className="relative h-16 w-16">
-                <Image
-                  src={profile.photoUrl}
-                  alt={profile.firstName}
-                  fill
-                  className="rounded-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-                <span className="text-2xl text-gray-600 dark:text-gray-300">
-                  {profile.firstName[0]}
-                </span>
-              </div>
-            )}
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Profile header / En-tête du profil */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+          <div className="flex items-center space-x-6">
+            <div className="relative w-24 h-24">
+              <Image
+                src={profile.photoURL || '/default-avatar.png'}
+                alt={profile.username}
+                fill
+                className="rounded-full object-cover"
+              />
+            </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {profile.firstName} {profile.lastName}
+                {profile.username}
               </h1>
-              {profile.username && (
-                <p className="text-gray-600 dark:text-gray-300">
-                  @{profile.username}
-                </p>
-              )}
+              <p className="text-gray-600 dark:text-gray-400">
+                {profile.email}
+              </p>
             </div>
-          </div>
-
-          <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  ID Telegram
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {profile.telegramId}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Solde
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {profile.balance} crédits
-                </dd>
-              </div>
-            </dl>
           </div>
         </div>
 
-        {/* Historique des matchs */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              Historique de matchs
-            </h2>
-          </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        {/* Match history / Historique des matchs */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            {t('profile.matchHistory')}
+          </h2>
+          <div className="space-y-4">
             {mockMatches.map((match) => (
-              <div key={match.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {match.game}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(match.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        match.result === 'win'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : match.result === 'loss'
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                      }`}
-                    >
-                      {match.result === 'win'
-                        ? 'Victoire'
-                        : match.result === 'loss'
-                        ? 'Défaite'
-                        : 'Égalité'}
-                    </span>
-                    <span
-                      className={`text-sm font-medium ${
-                        match.amount > 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
-                    >
-                      {match.amount > 0 ? '+' : ''}
-                      {match.amount} crédits
-                    </span>
-                  </div>
+              <div
+                key={match.id}
+                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    vs {match.opponent}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {match.date}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {match.score}
+                  </p>
+                  <p className={`text-sm ${
+                    match.result === 'win'
+                      ? 'text-green-600 dark:text-green-400'
+                      : match.result === 'loss'
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-yellow-600 dark:text-yellow-400'
+                  }`}>
+                    {t(`profile.${match.result}`)}
+                  </p>
                 </div>
               </div>
             ))}
@@ -158,4 +129,6 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+};
+
+export default ProfilePage; 
