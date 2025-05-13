@@ -2,56 +2,60 @@
 
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useUserPreferences } from '@/context/UserPreferencesContext';
-import { formatCurrency } from '@/utils/currency';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const UserInfo: React.FC = () => {
-  const { profile, loading } = useAuth();
-  const { preferences } = useUserPreferences();
+  const { t } = useTranslation();
+  const { profile, loading, user } = useAuth();
 
-  // If profile is loading / Si le profil est en cours de chargement
   if (loading) {
     return (
-      <div className="animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="space-y-3 mt-4">
-          <div className="h-4 bg-gray-200 rounded"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-        </div>
+      <div className="animate-pulse flex items-center space-x-4">
+        <div className="rounded-full bg-gray-200 dark:bg-gray-700 h-10 w-10"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
       </div>
     );
   }
 
-  // If user is not logged in / Si l'utilisateur n'est pas connecté
-  if (!profile) {
-    return null;
+  if (!profile || !user) {
+    return (
+      <Link
+        href="/login"
+        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+      >
+        {t('auth.login')}
+      </Link>
+    );
   }
 
-  // Format balance / Formater le solde
-  const formattedBalance = formatCurrency(profile.balance, preferences.currency);
+  // Get display name for avatar alt text
+  const displayName = profile.username || profile.firstName || 'User';
 
   return (
     <div className="flex items-center space-x-4">
-      <div className="flex-shrink-0 relative w-10 h-10">
-        <Image
-          src={profile.photoUrl || '/default-avatar.png'}
-          alt={profile.username || profile.firstName}
-          fill
-          className="rounded-full object-cover"
-        />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {profile.username || profile.firstName}
+      <div className="text-right">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t('dashboard.balance')}
         </p>
-        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="ml-1">{formattedBalance}</span>
-        </div>
+        <p className="text-lg font-semibold text-amber-500">
+          {profile.balance} {t('common.coins')}
+        </p>
       </div>
+      <Link href="/profile" className="flex items-center space-x-2">
+        <div className="relative w-10 h-10">
+          <Image
+            src={profile.photoUrl || '/default-avatar.png'}
+            alt={displayName}
+            fill
+            className="rounded-full object-cover"
+          />
+        </div>
+        <span className="text-gray-900 dark:text-white">
+          {displayName}
+        </span>
+      </Link>
     </div>
   );
 };

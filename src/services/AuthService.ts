@@ -29,7 +29,7 @@ const TELEGRAM_AUTH_API = process.env.NEXT_PUBLIC_API_URL || 'https://snap-arena
 
 class AuthService {
   // Check authentication state / Vérifier l'état de l'authentification
-  getCurrentUser(): Promise<FirebaseUser | null> {
+  getCurrentUser(): FirebaseUser | null {
     return auth.currentUser;
   }
 
