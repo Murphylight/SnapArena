@@ -42,7 +42,11 @@ const mockMatches: Match[] = [
 // Profile page component / Composant de la page de profil
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
-  const { profile, loading } = useAuth();
+  const { profile, loading, user } = useAuth();
+
+  console.log('Profile page - User:', user); // Debug log
+  console.log('Profile page - Profile:', profile); // Debug log
+  console.log('Profile page - Loading:', loading); // Debug log
 
   if (loading) {
     return (
@@ -52,7 +56,8 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  if (!profile) {
+  if (!profile || !user) {
+    console.log('No profile or user found, showing not logged in message'); // Debug log
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-xl text-gray-600 dark:text-gray-400">

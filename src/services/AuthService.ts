@@ -74,22 +74,26 @@ class AuthService {
   // Login with Telegram / Se connecter avec Telegram
   async loginWithTelegram(telegramUser: TelegramUser): Promise<UserProfile> {
     try {
-      // Validate Telegram auth and get Firebase token / Valider l'authentification Telegram et obtenir un token Firebase
-      const customToken = await this.validateTelegramLogin(telegramUser);
+      console.log('Starting Telegram login process with:', telegramUser);
       
-      // Sign in to Firebase with custom token / Se connecter à Firebase avec le token personnalisé
+      // Validate Telegram auth and get Firebase token
+      const customToken = await this.validateTelegramLogin(telegramUser);
+      console.log('Received custom token');
+      
+      // Sign in to Firebase with custom token
       const userCredential = await signInWithCustomToken(auth, customToken);
       const { user } = userCredential;
+      console.log('Firebase user created:', user.uid);
       
-      // Check if user exists in Firestore / Vérifier si l'utilisateur existe déjà dans Firestore
+      // Check if user exists in Firestore
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
       
       let userProfile: UserProfile;
       
       if (userSnap.exists()) {
-        // Update login information / Mettre à jour les informations de connexion
-        userProfile = userSnap.data() as UserProfile;
+        console.log('Updating existing user profile');
+        // Update login information
         await updateDoc(userRef, {
           lastLoginAt: serverTimestamp(),
           firstName: telegramUser.first_name,
@@ -97,8 +101,13 @@ class AuthService {
           username: telegramUser.username || '',
           photoUrl: telegramUser.photo_url || '',
         });
+        
+        // Get updated profile
+        const updatedSnap = await getDoc(userRef);
+        userProfile = updatedSnap.data() as UserProfile;
       } else {
-        // Create new user profile / Créer un nouveau profil utilisateur
+        console.log('Creating new user profile');
+        // Create new user profile
         userProfile = {
           uid: user.uid,
           telegramId: telegramUser.id,
@@ -114,6 +123,7 @@ class AuthService {
         await setDoc(userRef, userProfile);
       }
       
+      console.log('Final user profile:', userProfile);
       return userProfile;
     } catch (error) {
       console.error('Error logging in with Telegram:', error);

@@ -44,6 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user); // Debug log
       setUser(user);
       setLoading(true);
 
@@ -55,13 +56,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           
           if (userDoc.exists()) {
             const userData = userDoc.data() as UserProfile;
+            console.log('User profile loaded:', userData); // Debug log
             setProfile(userData);
+          } else {
+            console.log('No user profile found in Firestore'); // Debug log
           }
         } catch (err) {
-          setError('Error loading user profile / Erreur lors du chargement du profil utilisateur');
-          console.error('Error loading user profile / Erreur lors du chargement du profil utilisateur:', err);
+          console.error('Error loading user profile:', err);
+          setError('Error loading user profile');
         }
       } else {
+        console.log('No user found'); // Debug log
         setProfile(null);
       }
 
@@ -74,12 +79,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Login with Telegram / Connexion avec Telegram
   const loginWithTelegram = async (telegramUser: TelegramUser) => {
+    console.log('Logging in with Telegram user:', telegramUser); // Debug log
     setLoading(true);
     setError(null);
     
     try {
       const userProfile = await authService.loginWithTelegram(telegramUser);
+      console.log('User profile after login:', userProfile); // Debug log
       const currentUser = await authService.getCurrentUser();
+      console.log('Current user after login:', currentUser); // Debug log
       
       setUser(currentUser);
       setProfile(userProfile);
