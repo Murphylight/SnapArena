@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -42,13 +42,19 @@ const mockMatches: Match[] = [
 // Profile page component / Composant de la page de profil
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
-  const { profile, loading, user } = useAuth();
+  const { profile, loading, user, error } = useAuth();
 
-  console.log('Profile page - User:', user); // Debug log
-  console.log('Profile page - Profile:', profile); // Debug log
-  console.log('Profile page - Loading:', loading); // Debug log
+  useEffect(() => {
+    console.log('Profile page - Mount/Update:', {
+      user: user?.uid,
+      profile,
+      loading,
+      error
+    });
+  }, [user, profile, loading, error]);
 
   if (loading) {
+    console.log('Profile page - Loading state');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
@@ -56,8 +62,19 @@ const ProfilePage: React.FC = () => {
     );
   }
 
+  if (error) {
+    console.log('Profile page - Error state:', error);
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-xl text-red-600 dark:text-red-400">
+          {error}
+        </p>
+      </div>
+    );
+  }
+
   if (!profile || !user) {
-    console.log('No profile or user found, showing not logged in message'); // Debug log
+    console.log('Profile page - Not logged in state');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-xl text-gray-600 dark:text-gray-400">
@@ -69,6 +86,12 @@ const ProfilePage: React.FC = () => {
 
   // Get display name for avatar alt text
   const displayName = profile.username || profile.firstName || 'User';
+
+  console.log('Profile page - Rendering profile:', {
+    displayName,
+    balance: profile.balance,
+    photoUrl: profile.photoUrl
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 pt-20 pb-16">
