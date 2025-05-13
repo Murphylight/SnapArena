@@ -32,6 +32,9 @@ export default function DashboardLayout({
     );
   }
 
+  // Get display name for avatar alt text
+  const displayName = profile.username || profile.firstName || 'User';
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Fixed Header / En-tête fixe */}
@@ -54,13 +57,13 @@ export default function DashboardLayout({
                 <div className="relative w-10 h-10">
                   <Image
                     src={profile.photoUrl || '/default-avatar.png'}
-                    alt={profile.username || profile.firstName}
+                    alt={displayName}
                     fill
                     className="rounded-full object-cover"
                   />
                 </div>
                 <span className="text-gray-900 dark:text-white">
-                  {profile.username || profile.firstName}
+                  {displayName}
                 </span>
               </Link>
             </div>
