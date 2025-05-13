@@ -8,6 +8,31 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Image from 'next/image';
 
+// Custom arrow components
+const PrevArrow = ({ onClick }: { onClick?: () => void }) => (
+  <button
+    onClick={onClick}
+    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+    aria-label="Previous slide"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+  </button>
+);
+
+const NextArrow = ({ onClick }: { onClick?: () => void }) => (
+  <button
+    onClick={onClick}
+    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+    aria-label="Next slide"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+  </button>
+);
+
 const HomeSlider: React.FC = () => {
   const { t } = useTranslation();
 
@@ -20,7 +45,7 @@ const HomeSlider: React.FC = () => {
 
     const linkThemeElement = document.createElement('link');
     linkThemeElement.rel = 'stylesheet';
-    linkThemeElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css';
+    linkElement.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css';
     document.head.appendChild(linkThemeElement);
 
     return () => {
@@ -64,11 +89,25 @@ const HomeSlider: React.FC = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 5000,
-    pauseOnHover: true
+    pauseOnHover: true,
+    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow />,
+    customPaging: () => (
+      <div className="w-2 h-2 bg-white/50 rounded-full transition-all duration-300 hover:bg-white" />
+    ),
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+          dots: true
+        }
+      }
+    ]
   };
 
   return (
-    <div className="relative">
+    <div className="relative" role="region" aria-label="Featured content slider">
       <Slider {...settings}>
         {slides.map((slide, index) => (
           <motion.div
@@ -88,15 +127,17 @@ const HomeSlider: React.FC = () => {
                   className="object-cover"
                   priority={index === 0}
                   quality={90}
+                  loading={index === 0 ? "eager" : "lazy"}
                 />
               </div>
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                <div className="text-center text-white p-4">
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40 flex items-center justify-center">
+                <div className="text-center text-white p-4 max-w-3xl mx-auto">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">{slide.title}</h2>
                   <p className="text-lg md:text-xl mb-8">{slide.description}</p>
                   <a
                     href={slide.link}
                     className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-full transition-colors"
+                    aria-label={`Learn more about ${slide.title}`}
                   >
                     {t('common.learnMore')}
                   </a>
