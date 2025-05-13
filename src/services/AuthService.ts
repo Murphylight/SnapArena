@@ -1,31 +1,27 @@
 import { auth, db } from '@/config/firebase';
-import { 
-  signInWithCustomToken, 
-  signOut, 
-  onAuthStateChanged,
-  User as FirebaseUser 
+import {
+  signInWithCustomToken,
+  signOut as firebaseSignOut,
+  User as FirebaseUser,
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  serverTimestamp, 
-  updateDoc,
-  Timestamp 
+import {
+  doc,
+  setDoc,
+  getDoc,
 } from 'firebase/firestore';
-import type { TelegramUser } from '@/types/telegram';
+import { TelegramUser } from '@/types/telegram';
 
 // Types / Types
 export interface UserProfile {
   uid: string;
-  telegramId: number;
-  firstName: string;
-  lastName?: string;
   username?: string;
+  firstName?: string;
+  lastName?: string;
   photoUrl?: string;
   balance: number;
-  lastLoginAt: Timestamp;
-  createdAt: Timestamp;
+  telegramId?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Telegram Auth API URL / URL de l'API d'authentification Telegram
@@ -34,12 +30,7 @@ const TELEGRAM_AUTH_API = process.env.NEXT_PUBLIC_API_URL || 'https://snap-arena
 class AuthService {
   // Check authentication state / Vérifier l'état de l'authentification
   getCurrentUser(): Promise<FirebaseUser | null> {
-    return new Promise((resolve) => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        unsubscribe();
-        resolve(user);
-      });
-    });
+    return auth.currentUser;
   }
 
   // Validate Telegram authentication / Vérifier l'authentification Telegram
@@ -74,59 +65,69 @@ class AuthService {
   // Login with Telegram / Se connecter avec Telegram
   async loginWithTelegram(telegramUser: TelegramUser): Promise<UserProfile> {
     try {
-      console.log('Starting Telegram login process with:', telegramUser);
+      console.log('Starting Telegram login process...'); // Debug log
       
-      // Validate Telegram auth and get Firebase token
-      const customToken = await this.validateTelegramLogin(telegramUser);
-      console.log('Received custom token');
-      
-      // Sign in to Firebase with custom token
-      const userCredential = await signInWithCustomToken(auth, customToken);
-      const { user } = userCredential;
-      console.log('Firebase user created:', user.uid);
-      
-      // Check if user exists in Firestore
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      let userProfile: UserProfile;
-      
-      if (userSnap.exists()) {
-        console.log('Updating existing user profile');
-        // Update login information
-        await updateDoc(userRef, {
-          lastLoginAt: serverTimestamp(),
-          firstName: telegramUser.first_name,
-          lastName: telegramUser.last_name || '',
-          username: telegramUser.username || '',
-          photoUrl: telegramUser.photo_url || '',
-        });
-        
-        // Get updated profile
-        const updatedSnap = await getDoc(userRef);
-        userProfile = updatedSnap.data() as UserProfile;
-      } else {
-        console.log('Creating new user profile');
-        // Create new user profile
-        userProfile = {
-          uid: user.uid,
-          telegramId: telegramUser.id,
-          firstName: telegramUser.first_name,
-          lastName: telegramUser.last_name,
-          username: telegramUser.username,
-          photoUrl: telegramUser.photo_url,
-          balance: 0,
-          lastLoginAt: serverTimestamp() as Timestamp,
-          createdAt: serverTimestamp() as Timestamp,
-        };
-        
-        await setDoc(userRef, userProfile);
+      // Get custom token from your backend
+      const response = await fetch('/api/auth/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(telegramUser),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get custom token');
       }
+
+      const { token } = await response.json();
+      console.log('Received custom token'); // Debug log
+
+      // Sign in with custom token
+      const userCredential = await signInWithCustomToken(auth, token);
+      const user = userCredential.user;
+      console.log('Signed in with custom token:', user.uid); // Debug log
+
+      // Create or update user profile
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
       
-      console.log('Final user profile:', userProfile);
+      const userData: Partial<UserProfile> = {
+        uid: user.uid,
+        username: telegramUser.username,
+        firstName: telegramUser.first_name,
+        lastName: telegramUser.last_name,
+        photoUrl: telegramUser.photo_url,
+        telegramId: telegramUser.id.toString(),
+        updatedAt: new Date(),
+      };
+
+      if (!userDoc.exists()) {
+        // New user
+        console.log('Creating new user profile...'); // Debug log
+        await setDoc(userRef, {
+          ...userData,
+          balance: 1000, // Starting balance
+          createdAt: new Date(),
+        });
+      } else {
+        // Update existing user
+        console.log('Updating existing user profile...'); // Debug log
+        await setDoc(userRef, userData, { merge: true });
+      }
+
+      // Get the complete user profile
+      const updatedUserDoc = await getDoc(userRef);
+      if (!updatedUserDoc.exists()) {
+        throw new Error('Failed to create user profile');
+      }
+
+      const userProfile = updatedUserDoc.data() as UserProfile;
+      console.log('User profile created/updated:', userProfile); // Debug log
+      
       return userProfile;
     } catch (error) {
-      console.error('Error logging in with Telegram:', error);
+      console.error('Error in loginWithTelegram:', error);
       throw error;
     }
   }
@@ -134,24 +135,24 @@ class AuthService {
   // Logout / Se déconnecter
   async logout(): Promise<void> {
     try {
-      await signOut(auth);
+      await firebaseSignOut(auth);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error during logout:', error);
       throw error;
     }
   }
 
   // Get user profile / Obtenir le profil utilisateur
-  async getUserProfile(uid: string): Promise<UserProfile | null> {
+  async getUserProfile(uid: string): Promise<UserProfile> {
     try {
       const userRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userRef);
+      const userDoc = await getDoc(userRef);
       
-      if (userSnap.exists()) {
-        return userSnap.data() as UserProfile;
+      if (!userDoc.exists()) {
+        throw new Error('User profile not found');
       }
       
-      return null;
+      return userDoc.data() as UserProfile;
     } catch (error) {
       console.error('Error getting user profile:', error);
       throw error;

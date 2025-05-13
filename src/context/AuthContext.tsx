@@ -60,6 +60,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setProfile(userData);
           } else {
             console.log('No user profile found in Firestore'); // Debug log
+            // Try to get profile from auth service as fallback
+            try {
+              const userProfile = await authService.getUserProfile(user.uid);
+              console.log('User profile loaded from auth service:', userProfile);
+              setProfile(userProfile);
+            } catch (err) {
+              console.error('Error loading profile from auth service:', err);
+            }
           }
         } catch (err) {
           console.error('Error loading user profile:', err);
@@ -86,14 +94,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const userProfile = await authService.loginWithTelegram(telegramUser);
       console.log('User profile after login:', userProfile); // Debug log
-      const currentUser = await authService.getCurrentUser();
+      
+      // Wait for auth state to update
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
       console.log('Current user after login:', currentUser); // Debug log
       
-      setUser(currentUser);
-      setProfile(userProfile);
-      
-      // Redirect to dashboard after successful login
-      router.push('/dashboard');
+      if (currentUser) {
+        setUser(currentUser);
+        setProfile(userProfile);
+        
+        // Ensure profile is set before redirecting
+        if (userProfile) {
+          console.log('Redirecting to dashboard...'); // Debug log
+          router.push('/dashboard');
+        } else {
+          console.error('No user profile available for redirect');
+          setError('Failed to load user profile');
+        }
+      } else {
+        console.error('No current user after login');
+        setError('Failed to login with Telegram');
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError('Failed to login with Telegram');
