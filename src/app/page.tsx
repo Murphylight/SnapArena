@@ -1,16 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import HomeSlider from '@/components/HomeSlider';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import AnimatedLogo from '@/components/AnimatedLogo';
-import HomeSlider from '@/components/HomeSlider';
 import RecentBets from '@/components/RecentBets';
 import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
-import { useAuth } from '@/context/AuthContext';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
 
 // Animation variants
@@ -36,7 +37,27 @@ const staggerContainer = {
 
 export default function Home() {
   const { t } = useTranslation();
-  const { profile, user } = useAuth();
+  const { user, profile, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log('Home page - Auth state:', { user: user?.uid, profile, loading });
+    
+    // Si l'utilisateur est connecté et a un profil, rediriger vers le dashboard
+    if (!loading && user && profile) {
+      console.log('User is authenticated, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  }, [user, profile, loading, router]);
+
+  // Afficher un loader pendant la vérification de l'authentification
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
 
   const features = [
     {
@@ -110,12 +131,7 @@ export default function Home() {
             <div className="mt-10 space-y-6">
               {!profile && !user && (
                 <div className="mt-8 flex justify-center">
-                  <TelegramLoginButton
-                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
-                    onAuth={(user) => {
-                      console.log('Telegram auth successful:', user);
-                    }}
-                  />
+                  <TelegramLoginButton />
                 </div>
               )}
               {!profile ? (
@@ -246,12 +262,7 @@ export default function Home() {
             <div className="mt-8">
               {!profile && !user && (
                 <div className="mt-8 flex justify-center">
-                  <TelegramLoginButton
-                    botName={process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || 'SnapArenaBot'}
-                    onAuth={(user) => {
-                      console.log('Telegram auth successful:', user);
-                    }}
-                  />
+                  <TelegramLoginButton />
                 </div>
               )}
               {!profile ? (
