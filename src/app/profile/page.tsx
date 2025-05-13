@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 // Interface for match data / Interface pour les données de match
@@ -44,7 +43,6 @@ const mockMatches: Match[] = [
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { profile, loading } = useAuth();
-  const router = useRouter();
 
   if (loading) {
     return (
@@ -72,18 +70,18 @@ const ProfilePage: React.FC = () => {
           <div className="flex items-center space-x-6">
             <div className="relative w-24 h-24">
               <Image
-                src={profile.photoURL || '/default-avatar.png'}
-                alt={profile.username}
+                src={profile.photoUrl || '/default-avatar.png'}
+                alt={profile.username || profile.firstName}
                 fill
                 className="rounded-full object-cover"
               />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {profile.username}
+                {profile.username || profile.firstName}
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                {profile.email}
+                {profile.firstName} {profile.lastName}
               </p>
             </div>
           </div>

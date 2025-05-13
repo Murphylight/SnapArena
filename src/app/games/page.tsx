@@ -80,7 +80,8 @@ const demoGames: Game[] = [
 
 export default function GamesPage() {
   const { t } = useTranslation();
-  const { currency } = useUserPreferences();
+  const { preferences } = useUserPreferences();
+  const { currency } = preferences;
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

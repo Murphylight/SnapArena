@@ -5,19 +5,14 @@ import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { CountryCode, countryNames } from '@/i18n';
 
 const CountrySelector: React.FC = () => {
-  const { country, setCountry, isLoading } = useUserPreferences();
-
-  if (isLoading) {
-    return (
-      <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-md h-8 w-24"></div>
-    );
-  }
+  const { preferences, updatePreferences } = useUserPreferences();
+  const { language } = preferences;
 
   return (
     <div className="relative">
       <select
-        value={country}
-        onChange={(e) => setCountry(e.target.value as CountryCode)}
+        value={language}
+        onChange={(e) => updatePreferences({ language: e.target.value as CountryCode })}
         className="appearance-none bg-transparent border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400"
       >
         {Object.entries(countryNames).map(([code, name]) => (

@@ -4,6 +4,7 @@ import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
 import { formatCurrency } from '@/utils/currency';
+import Image from 'next/image';
 
 const UserInfo: React.FC = () => {
   const { profile, loading } = useAuth();
@@ -32,16 +33,17 @@ const UserInfo: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-4">
-      <div className="flex-shrink-0">
-        <img
-          className="h-10 w-10 rounded-full"
+      <div className="flex-shrink-0 relative w-10 h-10">
+        <Image
           src={profile.photoUrl || '/default-avatar.png'}
-          alt={profile.displayName}
+          alt={profile.username || profile.firstName}
+          fill
+          className="rounded-full object-cover"
         />
       </div>
       <div>
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {profile.displayName}
+          {profile.username || profile.firstName}
         </p>
         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

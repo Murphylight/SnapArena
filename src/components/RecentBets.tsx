@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useUserPreferences } from '@/context/UserPreferencesContext';
-import bettingService, { BetResult } from '@/services/BettingService';
-import { Timestamp } from 'firebase/firestore';
 import { formatCurrency } from '@/utils/currency';
 
 // Animation variants / Variantes d'animation
@@ -36,12 +34,65 @@ interface Bet {
 }
 
 interface RecentBetsProps {
-  bets: Bet[];
+  limit?: number;
 }
 
-const RecentBets: React.FC<RecentBetsProps> = ({ bets }) => {
+const mockBets: Bet[] = [
+  {
+    id: '1',
+    gameName: 'Racing Fury',
+    amount: 10,
+    status: 'won',
+    timestamp: new Date()
+  },
+  {
+    id: '2',
+    gameName: 'Sniper Elite',
+    amount: 5,
+    status: 'lost',
+    timestamp: new Date()
+  },
+  {
+    id: '3',
+    gameName: 'Puzzle Masters',
+    amount: 8,
+    status: 'pending',
+    timestamp: new Date()
+  },
+  {
+    id: '4',
+    gameName: 'Galaxy Wars',
+    amount: 12,
+    status: 'won',
+    timestamp: new Date()
+  },
+  {
+    id: '5',
+    gameName: 'Battle Chess',
+    amount: 7,
+    status: 'lost',
+    timestamp: new Date()
+  },
+  {
+    id: '6',
+    gameName: 'Speed Run',
+    amount: 15,
+    status: 'won',
+    timestamp: new Date()
+  }
+];
+
+const RecentBets: React.FC<RecentBetsProps> = ({ limit }) => {
   const { t } = useTranslation();
   const { preferences } = useUserPreferences();
+  const [bets, setBets] = useState<Bet[]>([]);
+
+  useEffect(() => {
+    // Replace this with real fetch logic if needed
+    setBets(mockBets);
+  }, []);
+
+  const displayedBets = limit ? bets.slice(0, limit) : bets;
 
   // Currency format / Format de la devise
   const formatAmount = (amount: number) => {
@@ -67,7 +118,7 @@ const RecentBets: React.FC<RecentBetsProps> = ({ bets }) => {
         {t('bets.recent')}
       </h2>
       <div className="space-y-4">
-        {bets.map((bet) => (
+        {displayedBets.map((bet) => (
           <motion.div
             key={bet.id}
             className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Currency } from '@/i18n';
 
 // Context for user preferences / Contexte pour les préférences utilisateur
 interface UserPreferences {
@@ -9,6 +10,7 @@ interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   notifications: boolean;
   sound: boolean;
+  currency: Currency;
 }
 
 // Default preferences / Préférences par défaut
@@ -16,7 +18,13 @@ const defaultPreferences: UserPreferences = {
   language: 'en',
   theme: 'system',
   notifications: true,
-  sound: true
+  sound: true,
+  currency: {
+    code: 'USD',
+    symbol: '$',
+    name: 'US Dollar',
+    exchangeRate: 1
+  }
 };
 
 // Create context / Créer le contexte

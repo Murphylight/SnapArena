@@ -8,17 +8,6 @@ import { TelegramUser } from '@/types/telegram';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
-// Interface for user profile / Interface pour le profil utilisateur
-interface UserProfile {
-  id: string;
-  username: string;
-  email: string;
-  photoURL?: string;
-  telegramId?: string;
-  createdAt: Date;
-  lastLogin: Date;
-}
-
 // Interface for auth context / Interface pour le contexte d'authentification
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -65,16 +54,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           
           if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setProfile({
-              id: user.uid,
-              username: userData.username,
-              email: userData.email,
-              photoURL: userData.photoURL,
-              telegramId: userData.telegramId,
-              createdAt: userData.createdAt.toDate(),
-              lastLogin: userData.lastLogin.toDate()
-            });
+            const userData = userDoc.data() as UserProfile;
+            setProfile(userData);
           }
         } catch (err) {
           setError('Error loading user profile / Erreur lors du chargement du profil utilisateur');

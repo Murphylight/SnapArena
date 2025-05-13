@@ -1,4 +1,5 @@
-'use client';
+"use client";
+export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,8 @@ const fadeIn = {
 
 export default function RacingFuryGame() {
   const { t } = useTranslation();
-  const { currency } = useUserPreferences();
+  const { preferences } = useUserPreferences();
+  const { currency } = preferences;
   const [betAmount, setBetAmount] = useState<number>(5);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');

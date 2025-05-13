@@ -1,6 +1,6 @@
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase';
 import { collection, doc, getDoc, getDocs, query, where, addDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { Bet, BetStatus, BetType } from '@/types/bet';
+import { Bet, BetStatus, BetType, Match } from '@/types/bet';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { orderBy, limit } from 'firebase/firestore';
@@ -93,7 +93,7 @@ class BettingService {
     try {
       const betsQuery = query(
         collection(db, this.betsCollection),
-        where('status', '==', BetStatus.ACTIVE)
+        where('status', '==', BetStatus.PENDING)
       );
 
       const querySnapshot = await getDocs(betsQuery);
@@ -185,7 +185,7 @@ export const getUserActiveBets = async (): Promise<Bet[]> => {
 };
 
 // Function to get user's bet history / Fonction pour obtenir l'historique des paris de l'utilisateur
-export const getUserBetHistory = async (limit: number = 10): Promise<Bet[]> => {
+export const getUserBetHistory = async (): Promise<Bet[]> => {
   const auth = getAuth();
   const db = getFirestore();
   const user = auth.currentUser;
@@ -200,7 +200,7 @@ export const getUserBetHistory = async (limit: number = 10): Promise<Bet[]> => {
       where('userId', '==', user.uid),
       where('status', 'in', ['won', 'lost']),
       orderBy('createdAt', 'desc'),
-      limit(limit)
+      limit(10)
     );
 
     const querySnapshot = await getDocs(betsQuery);
@@ -214,7 +214,7 @@ export const getUserBetHistory = async (limit: number = 10): Promise<Bet[]> => {
 };
 
 // Function to get upcoming matches / Fonction pour obtenir les matchs à venir
-export const getUpcomingMatches = async (limit: number = 5): Promise<Match[]> => {
+export const getUpcomingMatches = async (limitCount: number = 5): Promise<Match[]> => {
   const db = getFirestore();
 
   try {
@@ -223,7 +223,7 @@ export const getUpcomingMatches = async (limit: number = 5): Promise<Match[]> =>
       where('status', '==', 'scheduled'),
       where('startTime', '>', Timestamp.now()),
       orderBy('startTime', 'asc'),
-      limit(limit)
+      limit(limitCount)
     );
 
     const querySnapshot = await getDocs(matchesQuery);
