@@ -67,66 +67,67 @@ const ProfilePage: React.FC = () => {
     );
   }
 
+  // Get display name for avatar alt text
+  const displayName = profile.username || profile.firstName || 'User';
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Profile header / En-tête du profil */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex items-center space-x-6">
-            <div className="relative w-24 h-24">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 pt-20 pb-16">
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative w-32 h-32">
               <Image
                 src={profile.photoUrl || '/default-avatar.png'}
-                alt={profile.username || profile.firstName}
+                alt={displayName}
                 fill
                 className="rounded-full object-cover"
               />
             </div>
-            <div>
+            <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {profile.username || profile.firstName}
+                {displayName}
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
                 {profile.firstName} {profile.lastName}
               </p>
             </div>
           </div>
-        </div>
 
-        {/* Match history / Historique des matchs */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            {t('profile.matchHistory')}
-          </h2>
-          <div className="space-y-4">
-            {mockMatches.map((match) => (
-              <div
-                key={match.id}
-                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    vs {match.opponent}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {match.date}
-                  </p>
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              {t('profile.matchHistory')}
+            </h2>
+            <div className="space-y-4">
+              {mockMatches.map((match) => (
+                <div
+                  key={match.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      vs {match.opponent}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {match.date}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {match.score}
+                    </p>
+                    <p className={`text-sm ${
+                      match.result === 'win'
+                        ? 'text-green-600 dark:text-green-400'
+                        : match.result === 'loss'
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-yellow-600 dark:text-yellow-400'
+                    }`}>
+                      {t(`profile.${match.result}`)}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {match.score}
-                  </p>
-                  <p className={`text-sm ${
-                    match.result === 'win'
-                      ? 'text-green-600 dark:text-green-400'
-                      : match.result === 'loss'
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-yellow-600 dark:text-yellow-400'
-                  }`}>
-                    {t(`profile.${match.result}`)}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
