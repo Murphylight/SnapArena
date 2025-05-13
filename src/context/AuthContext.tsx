@@ -92,8 +92,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(currentUser);
       setProfile(userProfile);
       
-      // Redirect to games page after successful login / Rediriger vers la page des jeux après connexion réussie
-      router.push('/games');
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
       setError('Failed to login with Telegram');

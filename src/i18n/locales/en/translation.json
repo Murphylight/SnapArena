@@ -1,0 +1,37 @@
+{
+  "common": {
+    "learnMore": "Learn More",
+    "coins": "coins"
+  },
+  "auth": {
+    "pleaseLogin": "Please log in to continue"
+  },
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "balance": "Balance",
+    "quickStats": "Quick Stats",
+    "totalGames": "Total Games",
+    "winRate": "Win Rate",
+    "activeGames": "Active Games",
+    "noActiveGames": "No active games",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity",
+    "availableGames": "Available Games"
+  },
+  "games": {
+    "racingFury": {
+      "description": "Compete in high-speed races and win big!"
+    }
+  },
+  "profile": {
+    "notLoggedIn": "Please log in to view your profile",
+    "matchHistory": "Match History",
+    "win": "Win",
+    "loss": "Loss",
+    "draw": "Draw"
+  }
+} 
