@@ -1,94 +1,89 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { TelegramUser } from '@/types/telegram';
-
-// Component to display logs / Composant pour afficher les logs
-const DebugLog = ({ message }: { message: string }) => (
-  <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg max-w-md overflow-auto max-h-48">
-    <pre className="text-sm">{message}</pre>
-  </div>
-);
 
 const TelegramWebAppButton: React.FC = () => {
+  const { t } = useTranslation();
   const { loginWithTelegram } = useAuth();
   const router = useRouter();
-  const [debugLog, setDebugLog] = useState<string>('');
+  const [logs, setLogs] = useState<string[]>([]);
 
   const addLog = (message: string) => {
-    setDebugLog(prev => `${new Date().toISOString()}: ${message}\n${prev}`);
+    setLogs(prev => [...prev, `${new Date().toISOString()}: ${message}`]);
   };
 
   useEffect(() => {
-    const initTelegramWebApp = async () => {
+    const initWebApp = async () => {
       try {
-        addLog('Initializing Telegram WebApp...');
+        addLog('Initializing WebApp...');
         
-        // Check if Telegram script is loaded / Vérifier si le script Telegram est chargé
-        if (typeof window.Telegram === 'undefined') {
-          addLog('Telegram script not loaded, adding it...');
-          const script = document.createElement('script');
-          script.src = 'https://telegram.org/js/telegram-web-app.js';
-          script.async = true;
-          document.body.appendChild(script);
-          
-          // Wait for script to load / Attendre que le script soit chargé
-          await new Promise((resolve) => {
-            script.onload = resolve;
-          });
+        if (!window.Telegram?.WebApp) {
+          addLog('Telegram WebApp not found');
+          return;
         }
 
-        // Check if we're in Telegram / Vérifier si nous sommes dans Telegram
-        if (window.Telegram?.WebApp) {
-          addLog('Telegram WebApp detected');
-          
-          // Initialize WebApp / Initialiser le WebApp
-          const webApp = window.Telegram.WebApp;
-          webApp.ready();
-          webApp.expand();
-          
-          addLog(`WebApp initData: ${webApp.initData}`);
-          addLog(`WebApp initDataUnsafe: ${JSON.stringify(webApp.initDataUnsafe, null, 2)}`);
-          
-          const user = webApp.initDataUnsafe.user;
-          
-          if (user) {
-            addLog(`User found: ${JSON.stringify(user, null, 2)}`);
-            const telegramUser: TelegramUser = {
-              id: user.id,
-              first_name: user.first_name,
-              last_name: user.last_name,
-              username: user.username,
-              auth_date: Math.floor(Date.now() / 1000),
-              hash: webApp.initData,
+        // Initialize WebApp / Initialiser le WebApp
+        const webApp = window.Telegram.WebApp as {
+          ready: () => void;
+          expand: () => void;
+          initData: string;
+          initDataUnsafe: {
+            user?: {
+              id: number;
+              first_name: string;
+              last_name?: string;
+              username?: string;
             };
-            
-            addLog('Attempting to login with Telegram...');
-            await loginWithTelegram(telegramUser);
+          };
+        };
+        webApp.ready();
+        webApp.expand();
+
+        addLog(`WebApp initData: ${webApp.initData}`);
+
+        if (webApp.initDataUnsafe.user) {
+          addLog('User data found in WebApp');
+          const userData = webApp.initDataUnsafe.user;
+          
+          try {
+            await loginWithTelegram({
+              id: userData.id,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              username: userData.username,
+              hash: webApp.initData
+            });
             addLog('Login successful');
             
             // Redirect to profile page / Rediriger vers la page de profil
             router.push('/profile');
-          } else {
-            addLog('No user data found in WebApp');
+          } catch (error) {
+            addLog(`Login error: ${error instanceof Error ? error.message : String(error)}`);
           }
         } else {
-          addLog('Not in Telegram WebApp');
-          addLog(`window.Telegram: ${typeof window.Telegram}`);
-          addLog(`window.Telegram?.WebApp: ${typeof window.Telegram?.WebApp}`);
+          addLog('No user data in WebApp');
         }
       } catch (error) {
         addLog(`Error: ${error instanceof Error ? error.message : String(error)}`);
-        console.error('Error during Telegram WebApp initialization:', error);
       }
     };
 
-    initTelegramWebApp();
+    initWebApp();
   }, [loginWithTelegram, router]);
 
-  return <DebugLog message={debugLog} />;
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">{t('auth.telegramWebApp')}</h2>
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+        <pre className="whitespace-pre-wrap text-sm">
+          {logs.join('\n')}
+        </pre>
+      </div>
+    </div>
+  );
 };
 
 export default TelegramWebAppButton; 

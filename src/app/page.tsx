@@ -134,21 +134,12 @@ export default function Home() {
                   <TelegramLoginButton />
                 </div>
               )}
-              {!profile ? (
-                <Link 
-                  href="/games" 
-                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
-                >
-                  {t('home.exploreGames')}
-                </Link>
-              ) : (
-                <Link 
-                  href="/games" 
-                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
-                >
-                  {t('home.exploreGames')}
-                </Link>
-              )}
+              <Link 
+                href="/games" 
+                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
+              >
+                {t('home.exploreGames')}
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -260,26 +251,12 @@ export default function Home() {
               {t('home.joinToday')}
             </p>
             <div className="mt-8">
-              {!profile && !user && (
-                <div className="mt-8 flex justify-center">
-                  <TelegramLoginButton />
-                </div>
-              )}
-              {!profile ? (
-                <Link 
-                  href="/games" 
-                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-amber-600 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
-                >
-                  {t('home.startPlaying')}
-                </Link>
-              ) : (
-                <Link 
-                  href="/games" 
-                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-amber-600 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
-                >
-                  {t('home.startPlaying')}
-                </Link>
-              )}
+              <Link 
+                href="/games" 
+                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-amber-600 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
+              >
+                {t('home.startPlaying')}
+              </Link>
             </div>
           </motion.div>
         </div>
