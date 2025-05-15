@@ -1,66 +1,49 @@
-import { NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/firebase';
 import crypto from 'crypto';
-import { TelegramUser } from '@/types/telegram';
 
-// Initialiser Firebase Admin
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
-}
-
-// Fonction pour vérifier la signature Telegram
-function verifyTelegramAuth(authData: TelegramUser & { hash: string }): boolean {
-  const { hash, ...userData } = authData;
-  const dataCheckString = Object.keys(userData)
-    .sort()
-    .map(k => `${k}=${userData[k as keyof typeof userData]}`)
-    .join('\n');
-  
-  const secretKey = crypto.createHash('sha256')
-    .update(process.env.TELEGRAM_BOT_TOKEN || '')
-    .digest();
-  
-  const calculatedHash = crypto.createHmac('sha256', secretKey)
-    .update(dataCheckString)
-    .digest('hex');
-  
-  return calculatedHash === hash;
-}
-
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const telegramUser = await request.json();
+    const searchParams = request.nextUrl.searchParams;
+    const userData = searchParams.get('user');
 
-    // Vérifier la signature Telegram
-    if (!verifyTelegramAuth(telegramUser)) {
-      return NextResponse.json(
-        { error: 'Invalid Telegram authentication' },
-        { status: 401 }
-      );
+    if (!userData) {
+      return NextResponse.redirect(new URL('/?error=no_user_data', request.url));
+    }
+
+    const user = JSON.parse(userData);
+    
+    // Vérifier le hash Telegram
+    const dataCheckString = Object.keys(user)
+      .filter(key => key !== 'hash')
+      .map(key => `${key}=${user[key]}`)
+      .sort()
+      .join('\n');
+
+    const secretKey = crypto.createHash('sha256')
+      .update(process.env.TELEGRAM_BOT_TOKEN || '')
+      .digest();
+
+    const calculatedHash = crypto.createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex');
+
+    if (calculatedHash !== user.hash) {
+      return NextResponse.redirect(new URL('/?error=invalid_hash', request.url));
     }
 
     // Créer un token personnalisé Firebase
-    const customToken = await getAuth().createCustomToken(telegramUser.id.toString(), {
-      telegramId: telegramUser.id,
-      firstName: telegramUser.first_name,
-      lastName: telegramUser.last_name,
-      username: telegramUser.username,
-      photoUrl: telegramUser.photo_url,
+    const customToken = await auth.createCustomToken(user.id.toString(), {
+      telegram_id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      username: user.username,
     });
 
-    return NextResponse.json({ customToken });
+    // Rediriger vers la page de callback avec le token
+    return NextResponse.redirect(new URL(`/auth/callback?token=${customToken}`, request.url));
   } catch (error) {
-    console.error('Error in Telegram auth:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Telegram auth error:', error);
+    return NextResponse.redirect(new URL('/?error=auth_failed', request.url));
   }
 } 
