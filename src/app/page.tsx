@@ -139,7 +139,7 @@ export default function Home() {
             <div className="mt-10 space-y-6">
               {!user && (
                 <>
-                  <VisibilityToggle initialVisibility={isInTelegram}>
+                  <VisibilityToggle initialVisibility={isInTelegram} showToggle={false}>
                     <Link 
                       href="/dashboard" 
                       className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
@@ -148,7 +148,7 @@ export default function Home() {
                     </Link>
                   </VisibilityToggle>
 
-                  <VisibilityToggle initialVisibility={!isInTelegram}>
+                  <VisibilityToggle initialVisibility={!isInTelegram} showToggle={false}>
                     <a 
                       href="https://t.me/SnapArenaBot"
                       target="_blank"
