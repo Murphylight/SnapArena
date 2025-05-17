@@ -12,8 +12,6 @@ import RecentBets from '@/components/RecentBets';
 import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
-import BottomNav from '@/components/BottomNav';
-import Script from 'next/script';
 
 // Animation variants
 const fadeInUp = {
@@ -45,19 +43,16 @@ export default function Home() {
   useEffect(() => {
     // Vérifier si nous sommes dans Telegram WebApp
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      setIsInTelegram(true);
       const webApp = window.Telegram.WebApp;
+      setIsInTelegram(true);
       webApp.ready();
       webApp.expand();
     }
   }, []);
 
   useEffect(() => {
-    console.log('Home page - Auth state:', { user: user?.uid, profile, loading });
-    
     // Si l'utilisateur est connecté et a un profil, rediriger vers le dashboard
     if (!loading && user && profile) {
-      console.log('User is authenticated, redirecting to dashboard');
       router.push('/dashboard');
     }
   }, [user, profile, loading, router]);
@@ -141,7 +136,7 @@ export default function Home() {
               {t('home.slogan')}
             </p>
             <div className="mt-10 space-y-6">
-              {!profile && !user && (
+              {!user && (
                 <>
                   {isInTelegram ? (
                     <Link 
@@ -151,25 +146,17 @@ export default function Home() {
                       {t('common.playNow')}
                     </Link>
                   ) : (
-                    <>
-                      <Script
-                        src="https://telegram.org/js/telegram-widget.js?22"
-                        data-telegram-login="SnapArenaBot"
-                        data-size="large"
-                        data-radius="8"
-                        data-request-access="write"
-                        data-userpic="false"
-                        data-onauth="onTelegramAuth(user)"
-                        strategy="lazyOnload"
-                      />
-                      <Script id="telegram-login-handler">
-                        {`
-                          function onTelegramAuth(user) {
-                            window.location.href = '/api/auth/telegram?user=' + encodeURIComponent(JSON.stringify(user));
-                          }
-                        `}
-                      </Script>
-                    </>
+                    <a 
+                      href="https://t.me/SnapArenaBot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#0088cc] hover:bg-[#0077b3] md:py-4 md:text-lg md:px-10"
+                    >
+                      <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.2-.04-.28-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.29-.49.8-.75 3.12-1.36 5.2-2.26 6.24-2.7 2.97-1.23 3.59-1.44 4-1.44.09 0 .28.01.4.06.17.07.3.19.35.33.05.14.05.3.01.45z"/>
+                      </svg>
+                      {t('common.connectWithTelegram')}
+                    </a>
                   )}
                 </>
               )}
@@ -300,9 +287,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* Bottom Navigation */}
-      <BottomNav />
     </div>
   );
 }
