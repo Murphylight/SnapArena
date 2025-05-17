@@ -13,5 +13,6 @@ declare global {
     Telegram?: {
       WebApp: unknown;
     };
+    onTelegramAuth?: (user: TelegramUser) => void;
   }
 } 
