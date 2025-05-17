@@ -12,7 +12,7 @@ import RecentBets from '@/components/RecentBets';
 import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
-import TelegramLoginButton from '@/components/TelegramLoginButton';
+import TelegramWebAppButton from '@/components/TelegramWebAppButton';
 
 // Animation variants
 const fadeInUp = {
@@ -131,7 +131,7 @@ export default function Home() {
             <div className="mt-10 space-y-6">
               {!profile && !user && (
                 <div className="mt-8 flex justify-center">
-                  <TelegramLoginButton />
+                  <TelegramWebAppButton />
                 </div>
               )}
               <Link 
