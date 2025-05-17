@@ -29,7 +29,7 @@ export default function DashboardLayout({
           {t('auth.pleaseLogin')}
         </p>
       </div>
-    );
+    ); 
   }
 
   // Get display name for avatar alt text
