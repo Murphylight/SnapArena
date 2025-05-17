@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import Footer from '@/components/Footer';
+import TelegramInit from '@/components/TelegramInit';
 
 // Initialize Inter font / Initialiser la police Inter
 const inter = Inter({ subsets: ['latin'] });
@@ -39,6 +40,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased`}>
         <Providers>
+          <TelegramInit />
           <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
               {children}

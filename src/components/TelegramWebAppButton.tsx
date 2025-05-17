@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
+import type { TelegramWebApp } from '@/types/telegram';
 
 const TelegramWebAppButton: React.FC = () => {
   const { t } = useTranslation();
@@ -23,20 +24,7 @@ const TelegramWebAppButton: React.FC = () => {
           return;
         }
 
-        const webApp = window.Telegram.WebApp as {
-          ready: () => void;
-          expand: () => void;
-          initData: string;
-          colorScheme: string;
-          initDataUnsafe: {
-            user?: {
-              id: number;
-              first_name: string;
-              last_name?: string;
-              username?: string;
-            };
-          };
-        };
+        const webApp = window.Telegram.WebApp as TelegramWebApp;
 
         // Initialiser WebApp
         webApp.ready();
