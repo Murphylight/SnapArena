@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import HomeSlider from '@/components/HomeSlider';
@@ -12,7 +12,8 @@ import RecentBets from '@/components/RecentBets';
 import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
-import TelegramWebAppButton from '@/components/TelegramWebAppButton';
+import BottomNav from '@/components/BottomNav';
+import Script from 'next/script';
 
 // Animation variants
 const fadeInUp = {
@@ -39,6 +40,17 @@ export default function Home() {
   const { t } = useTranslation();
   const { user, profile, loading } = useAuth();
   const router = useRouter();
+  const [isInTelegram, setIsInTelegram] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si nous sommes dans Telegram WebApp
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      setIsInTelegram(true);
+      const webApp = window.Telegram.WebApp;
+      webApp.ready();
+      webApp.expand();
+    }
+  }, []);
 
   useEffect(() => {
     console.log('Home page - Auth state:', { user: user?.uid, profile, loading });
@@ -130,9 +142,36 @@ export default function Home() {
             </p>
             <div className="mt-10 space-y-6">
               {!profile && !user && (
-                <div className="mt-8 flex justify-center">
-                  <TelegramWebAppButton />
-                </div>
+                <>
+                  {isInTelegram ? (
+                    <Link 
+                      href="/dashboard" 
+                      className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
+                    >
+                      {t('common.playNow')}
+                    </Link>
+                  ) : (
+                    <>
+                      <Script
+                        src="https://telegram.org/js/telegram-widget.js?22"
+                        data-telegram-login="SnapArenaBot"
+                        data-size="large"
+                        data-radius="8"
+                        data-request-access="write"
+                        data-userpic="false"
+                        data-onauth="onTelegramAuth(user)"
+                        strategy="lazyOnload"
+                      />
+                      <Script id="telegram-login-handler">
+                        {`
+                          function onTelegramAuth(user) {
+                            window.location.href = '/api/auth/telegram?user=' + encodeURIComponent(JSON.stringify(user));
+                          }
+                        `}
+                      </Script>
+                    </>
+                  )}
+                </>
               )}
               <Link 
                 href="/games" 
@@ -261,6 +300,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }
