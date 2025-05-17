@@ -84,29 +84,40 @@ class AuthService {
     }
   }
 
-  public async loginWithTelegram(telegramData: TelegramData): Promise<FirebaseUser> {
+  public async loginWithTelegram(telegramData: TelegramData): Promise<void> {
     try {
       console.log('Attempting Telegram login with data:', telegramData);
       
-      // Create a custom token or use Firebase's anonymous auth
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        `${telegramData.id}@telegram.user`,
-        telegramData.hash
-      );
-      
-      console.log('Telegram login successful for:', userCredential.user.uid);
-      
-      // Update or create user profile
-      await this.createUserProfile(userCredential.user, {
+      // Vérifier que nous avons toutes les données nécessaires
+      if (!telegramData.id || !telegramData.hash) {
+        throw new Error('Missing required Telegram data');
+      }
+
+      // Préparer les données pour l'API
+      const userData = {
+        id: telegramData.id,
+        first_name: telegramData.first_name,
+        last_name: telegramData.last_name,
         username: telegramData.username,
-        firstName: telegramData.first_name,
-        lastName: telegramData.last_name,
-        photoUrl: telegramData.photo_url,
-        balance: 0,
-      });
+        photo_url: telegramData.photo_url,
+        hash: telegramData.hash
+      };
+
+      console.log('Sending data to API:', userData);
       
-      return userCredential.user;
+      // Appeler l'API pour obtenir un token personnalisé
+      const response = await fetch(`/api/auth/telegram?user=${encodeURIComponent(JSON.stringify(userData))}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response error:', errorText);
+        throw new Error(`Failed to get custom token: ${errorText}`);
+      }
+      
+      console.log('API response successful, redirecting to:', response.url);
+      
+      // Rediriger vers la page de callback qui gérera l'authentification
+      window.location.href = response.url;
     } catch (error) {
       console.error('Telegram login error:', error);
       throw error;

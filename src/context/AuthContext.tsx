@@ -84,29 +84,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login with Telegram / Connexion avec Telegram
   const loginWithTelegram = async (telegramData: TelegramData) => {
     try {
-      console.log('Attempting Telegram login');
-      setLoading(true);
       setError(null);
-
-      const user = await authService.loginWithTelegram(telegramData);
-      console.log('Telegram login successful:', user.uid);
-
-      const userProfile = await authService.getUserProfile(user.uid);
-      console.log('User profile after login:', userProfile);
-
-      setUser(user);
-      setProfile(userProfile);
-
-      if (userProfile) {
-        console.log('Redirecting to dashboard after login');
-        router.push('/dashboard');
-      }
-    } catch (err) {
-      console.error('Error in loginWithTelegram:', err);
-      setError(err instanceof Error ? err.message : 'Login failed');
-      throw err;
-    } finally {
-      setLoading(false);
+      console.log('Attempting Telegram login with data:', telegramData);
+      
+      // La méthode loginWithTelegram gère maintenant la redirection
+      await authService.loginWithTelegram(telegramData);
+      
+      // Pas besoin de gérer le retour utilisateur ici car la redirection
+      // vers /auth/callback s'en charge
+    } catch (error) {
+      console.error('Error in loginWithTelegram:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred');
+      throw error;
     }
   };
 
