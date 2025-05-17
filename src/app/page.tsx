@@ -12,6 +12,7 @@ import RecentBets from '@/components/RecentBets';
 import UserInfo from '@/components/UserInfo';
 import CountrySelector from '@/components/CountrySelector';
 import ThemeToggle from '@/components/ThemeToggle';
+import VisibilityToggle from '@/components/VisibilityToggle';
 
 // Animation variants
 const fadeInUp = {
@@ -138,14 +139,16 @@ export default function Home() {
             <div className="mt-10 space-y-6">
               {!user && (
                 <>
-                  {isInTelegram ? (
+                  <VisibilityToggle initialVisibility={isInTelegram}>
                     <Link 
                       href="/dashboard" 
                       className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 md:py-4 md:text-lg md:px-10"
                     >
                       {t('common.playNow')}
                     </Link>
-                  ) : (
+                  </VisibilityToggle>
+
+                  <VisibilityToggle initialVisibility={!isInTelegram}>
                     <a 
                       href="https://t.me/SnapArenaBot"
                       target="_blank"
@@ -157,7 +160,7 @@ export default function Home() {
                       </svg>
                       {t('common.connectWithTelegram')}
                     </a>
-                  )}
+                  </VisibilityToggle>
                 </>
               )}
               <Link 
