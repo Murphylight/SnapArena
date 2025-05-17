@@ -43,13 +43,29 @@ export default function Home() {
 
   useEffect(() => {
     // Vérifier si nous sommes dans Telegram WebApp
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const webApp = window.Telegram.WebApp;
-      setIsInTelegram(true);
-      webApp.ready();
-      webApp.expand();
+    if (typeof window !== 'undefined') {
+      const webApp = window.Telegram?.WebApp;
+      console.log('Telegram WebApp object:', webApp);
+      
+      if (webApp) {
+        console.log('Telegram WebApp detected');
+        console.log('Platform:', webApp.platform);
+        console.log('InitData:', webApp.initData);
+        console.log('InitDataUnsafe:', webApp.initDataUnsafe);
+        
+        setIsInTelegram(true);
+        webApp.ready();
+        webApp.expand();
+      } else {
+        console.log('Not in Telegram WebApp');
+        setIsInTelegram(false);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    console.log('isInTelegram state:', isInTelegram);
+  }, [isInTelegram]);
 
   useEffect(() => {
     // Si l'utilisateur est connecté et a un profil, rediriger vers le dashboard

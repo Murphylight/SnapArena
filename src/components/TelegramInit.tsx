@@ -1,41 +1,44 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
-const TelegramInit: React.FC = () => {
-  const { loginWithTelegram } = useAuth();
+export default function TelegramInit() {
+  const { user, loginWithTelegram } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const initTelegram = async () => {
-      if (typeof window === 'undefined' || !window.Telegram?.WebApp) return;
+    if (typeof window !== 'undefined') {
+      const webApp = window.Telegram?.WebApp;
+      console.log('TelegramInit - WebApp object:', webApp);
 
-      const webApp = window.Telegram.WebApp;
-      webApp.ready();
-      webApp.expand();
+      if (webApp) {
+        console.log('TelegramInit - Initializing WebApp');
+        webApp.ready();
+        webApp.expand();
 
-      if (webApp.initDataUnsafe?.user) {
-        try {
-          await loginWithTelegram({
-            id: webApp.initDataUnsafe.user.id,
-            first_name: webApp.initDataUnsafe.user.first_name,
-            last_name: webApp.initDataUnsafe.user.last_name,
-            username: webApp.initDataUnsafe.user.username,
+        // Si l'utilisateur n'est pas connecté et que nous avons des données d'initialisation
+        if (!user && webApp.initDataUnsafe?.user) {
+          console.log('TelegramInit - User data from WebApp:', webApp.initDataUnsafe.user);
+          const userData = {
+            ...webApp.initDataUnsafe.user,
             hash: webApp.initData
-          });
-          router.push('/dashboard');
-        } catch (error) {
-          console.error('Telegram login error:', error);
+          };
+          loginWithTelegram(userData)
+            .then(() => {
+              console.log('TelegramInit - Login successful');
+              router.push('/dashboard');
+            })
+            .catch((error) => {
+              console.error('TelegramInit - Login failed:', error);
+            });
         }
+      } else {
+        console.log('TelegramInit - Not in Telegram WebApp');
       }
-    };
-
-    initTelegram();
-  }, [loginWithTelegram, router]);
+    }
+  }, [user, loginWithTelegram, router]);
 
   return null;
-};
-
-export default TelegramInit; 
+} 

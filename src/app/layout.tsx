@@ -5,6 +5,7 @@ import { Providers } from './providers';
 import Footer from '@/components/Footer';
 import TelegramInit from '@/components/TelegramInit';
 import BottomNav from '@/components/BottomNav';
+import DebugPanel from '@/components/DebugPanel';
 
 // Initialize Inter font / Initialiser la police Inter
 const inter = Inter({ subsets: ['latin'] });
@@ -47,6 +48,7 @@ export default function RootLayout({
           </main>
           <BottomNav />
           <Footer />
+          <DebugPanel />
         </Providers>
       </body>
     </html>
