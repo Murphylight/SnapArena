@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import type { TelegramWebApp } from '@/types/telegram';
 
 const TelegramWebAppButton: React.FC = () => {
-  const { t } = useTranslation();
   const { loginWithTelegram, user } = useAuth();
   const router = useRouter();
   const [isInTelegram, setIsInTelegram] = useState(false);
@@ -25,17 +23,16 @@ const TelegramWebAppButton: React.FC = () => {
         }
 
         const webApp = window.Telegram.WebApp as TelegramWebApp;
+        setIsInTelegram(true);
 
         // Initialiser WebApp
         webApp.ready();
         webApp.expand();
 
-        if (webApp.initDataUnsafe.user) {
-          setIsInTelegram(true);
-          const userData = webApp.initDataUnsafe.user;
-          
+        // Si nous sommes dans Telegram et que l'utilisateur n'est pas connecté
+        if (!user && webApp.initDataUnsafe.user) {
           try {
-            // Connexion automatique avec Telegram
+            const userData = webApp.initDataUnsafe.user;
             await loginWithTelegram({
               id: userData.id,
               first_name: userData.first_name,
@@ -43,14 +40,6 @@ const TelegramWebAppButton: React.FC = () => {
               username: userData.username,
               hash: webApp.initData
             });
-
-            // Sauvegarder les préférences utilisateur
-            localStorage.setItem('userPreferences', JSON.stringify({
-              theme: webApp.colorScheme || 'light',
-              lastLogin: new Date().toISOString()
-            }));
-
-            // Rediriger vers le dashboard
             router.push('/dashboard');
           } catch (error) {
             console.error('Login error:', error);
@@ -64,11 +53,7 @@ const TelegramWebAppButton: React.FC = () => {
     };
 
     initWebApp();
-  }, [loginWithTelegram, router]);
-
-  const handlePlayNow = () => {
-    router.push('/dashboard');
-  };
+  }, [loginWithTelegram, router, user]);
 
   if (isLoading) {
     return (
@@ -78,17 +63,12 @@ const TelegramWebAppButton: React.FC = () => {
     );
   }
 
-  if (isInTelegram && user) {
-    return (
-      <button
-        onClick={handlePlayNow}
-        className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-      >
-        {t('common.playNow')}
-      </button>
-    );
+  // Ne rien afficher si nous sommes dans Telegram
+  if (isInTelegram) {
+    return null;
   }
 
+  // Afficher le bouton de connexion Telegram uniquement si nous ne sommes pas dans Telegram
   return (
     <>
       <Script
