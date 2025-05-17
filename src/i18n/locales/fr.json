@@ -108,5 +108,19 @@
   "theme": {
     "light": "Mode Clair",
     "dark": "Mode Sombre"
+  },
+  "common": {
+    "loading": "Chargement en cours...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "coins": "coins"
+  },
+  "auth": {
+    "pleaseLogin": "Connexion requise",
+    "loginRequired": "Veuillez vous connecter pour accéder à cette page",
+    "login": "Se connecter",
+    "loginError": "Erreur lors de la connexion",
+    "sessionExpired": "Votre session a expiré",
+    "pleaseRelogin": "Veuillez vous reconnecter pour continuer"
   }
 } 

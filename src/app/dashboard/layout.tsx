@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function DashboardLayout({
   children,
@@ -16,20 +17,41 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-amber-500"></div>
+        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 animate-pulse">
+          {t('common.loading')}
+        </p>
       </div>
     );
   }
 
   if (!profile || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-xl text-gray-600 dark:text-gray-400">
-          {t('auth.pleaseLogin')}
-        </p>
-      </div>
-    ); 
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900"
+      >
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-amber-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <p className="text-xl text-gray-800 dark:text-gray-200 mb-2">
+            {t('auth.pleaseLogin')}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t('auth.loginRequired')}
+          </p>
+          <Link 
+            href="/login" 
+            className="mt-4 inline-block px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+          >
+            {t('auth.login')}
+          </Link>
+        </div>
+      </motion.div>
+    );
   }
 
   // Get display name for avatar alt text
@@ -37,8 +59,11 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Fixed Header / En-tête fixe */}
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow z-50">
+      <motion.header 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow z-50"
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -69,15 +94,26 @@ export default function DashboardLayout({
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
-      {/* Main Content with padding for fixed header and footer / Contenu principal avec padding pour l'en-tête et le pied de page fixes */}
-      <main className="flex-grow pt-20 pb-16">
-        {children}
-      </main>
+      <AnimatePresence mode="wait">
+        <motion.main 
+          key={window.location.pathname}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="flex-grow pt-20 pb-16"
+        >
+          {children}
+        </motion.main>
+      </AnimatePresence>
 
-      {/* Fixed Footer / Pied de page fixe */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow z-50">
+      <motion.footer 
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow z-50"
+      >
         <div className="container mx-auto px-4 py-3">
           <nav className="flex justify-around items-center">
             <Link href="/dashboard" className="flex flex-col items-center text-amber-500">
@@ -101,7 +137,7 @@ export default function DashboardLayout({
             </Link>
           </nav>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 } 
